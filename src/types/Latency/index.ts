@@ -1,5 +1,5 @@
 type LatencyConfig = {
-    globalMs: number;
+	globalMs: number;
 };
 
 export type { LatencyConfig };

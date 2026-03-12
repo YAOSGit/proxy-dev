@@ -6,11 +6,13 @@ const server = http.createServer((req, res) => {
 
 	res.setHeader('Content-Type', 'application/json');
 	res.writeHead(200);
-	res.end(JSON.stringify({
-		message: 'Hello from api.local',
-		path: url.pathname,
-		timestamp: new Date().toISOString(),
-	}));
+	res.end(
+		JSON.stringify({
+			message: 'Hello from api.local',
+			path: url.pathname,
+			timestamp: new Date().toISOString(),
+		}),
+	);
 });
 
 server.listen(3001, () => {

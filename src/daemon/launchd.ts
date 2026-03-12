@@ -27,7 +27,11 @@ const generatePlist = (nodePath: string, daemonScriptPath: string): string => {
 `;
 };
 
-const writePlist = (plistPath: string, nodePath: string, daemonScriptPath: string): void => {
+const writePlist = (
+	plistPath: string,
+	nodePath: string,
+	daemonScriptPath: string,
+): void => {
 	const plist = generatePlist(nodePath, daemonScriptPath);
 	fs.writeFileSync(plistPath, plist, 'utf-8');
 };

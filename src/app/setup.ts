@@ -2,11 +2,19 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadGlobalConfig, loadLocalConfig, mergeConfigs } from '../utils/config/index.js';
-import { getCertsDir, getLeavesDir, getPidPath } from '../utils/platform/index.js';
-import { generateCA, loadCA, ensureLeafCert } from '../ssl/index.js';
+import { ensureLeafCert, generateCA, loadCA } from '../ssl/index.js';
 import type { ResolvedConfig } from '../types/Config/index.js';
 import type { CertPathsForWorker } from '../types/Ipc/index.js';
+import {
+	loadGlobalConfig,
+	loadLocalConfig,
+	mergeConfigs,
+} from '../utils/config/index.js';
+import {
+	getCertsDir,
+	getLeavesDir,
+	getPidPath,
+} from '../utils/platform/index.js';
 
 interface SetupResult {
 	resolved: ResolvedConfig;
@@ -14,7 +22,10 @@ interface SetupResult {
 	cleanup: () => void;
 }
 
-const setup = async (opts?: { config?: string; mode?: string }): Promise<SetupResult> => {
+const setup = async (opts?: {
+	config?: string;
+	mode?: string;
+}): Promise<SetupResult> => {
 	const global = loadGlobalConfig();
 	const local = loadLocalConfig(opts?.config ? opts.config : undefined);
 	const resolved = mergeConfigs(global, local);
@@ -37,8 +48,12 @@ const setup = async (opts?: { config?: string; mode?: string }): Promise<SetupRe
 	fs.writeFileSync(getPidPath(), String(process.pid));
 
 	// Ensure daemon is running
-	const { DaemonClient, spawnDaemon, isDaemonRunning } = await import('../daemon/index.js');
-	const { getDaemonSocketPath, getDaemonPidPath } = await import('../utils/platform/index.js');
+	const { DaemonClient, spawnDaemon, isDaemonRunning } = await import(
+		'../daemon/index.js'
+	);
+	const { getDaemonSocketPath, getDaemonPidPath } = await import(
+		'../utils/platform/index.js'
+	);
 
 	const socketPath = getDaemonSocketPath();
 	const pidPath = getDaemonPidPath();
@@ -50,7 +65,9 @@ const setup = async (opts?: { config?: string; mode?: string }): Promise<SetupRe
 			execFileSync('sudo', ['-v'], { stdio: 'inherit' });
 		} catch {
 			console.error('\n  Authentication failed or was cancelled.');
-			console.error('  proxy-dev needs sudo to manage /etc/hosts and listen on port 443/80.');
+			console.error(
+				'  proxy-dev needs sudo to manage /etc/hosts and listen on port 443/80.',
+			);
 			process.exit(1);
 		}
 		const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -72,15 +89,27 @@ const setup = async (opts?: { config?: string; mode?: string }): Promise<SetupRe
 			const client = new DaemonClient(socketPath);
 			await client.cleanup();
 		} catch {}
-		try { fs.unlinkSync(appPidPath); } catch {}
+		try {
+			fs.unlinkSync(appPidPath);
+		} catch {}
 		process.exit(0);
 	};
 	const cleanup = (): void => {
-		try { fs.unlinkSync(appPidPath); } catch {}
+		try {
+			fs.unlinkSync(appPidPath);
+		} catch {}
 	};
-	process.on('SIGTERM', () => { asyncCleanup(); });
-	process.on('SIGINT', () => { asyncCleanup(); });
-	process.on('exit', () => { try { fs.unlinkSync(appPidPath); } catch {} });
+	process.on('SIGTERM', () => {
+		asyncCleanup();
+	});
+	process.on('SIGINT', () => {
+		asyncCleanup();
+	});
+	process.on('exit', () => {
+		try {
+			fs.unlinkSync(appPidPath);
+		} catch {}
+	});
 
 	return {
 		resolved,

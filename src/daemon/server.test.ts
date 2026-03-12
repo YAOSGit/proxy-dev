@@ -4,13 +4,16 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DaemonCommand, DaemonResponse } from '../types/Ipc/index.js';
-import { startDaemonServer } from './server.js';
 import type { DaemonServerHandle } from './server.js';
+import { startDaemonServer } from './server.js';
 
-const sendCommand = (socketPath: string, command: DaemonCommand): Promise<DaemonResponse> => {
+const sendCommand = (
+	socketPath: string,
+	command: DaemonCommand,
+): Promise<DaemonResponse> => {
 	return new Promise((resolve, reject) => {
 		const client = net.createConnection(socketPath, () => {
-			client.write(JSON.stringify(command) + '\n');
+			client.write(`${JSON.stringify(command)}\n`);
 		});
 
 		let buffer = '';
@@ -46,7 +49,11 @@ describe('daemon server', () => {
 		pidPath = path.join(tmpDir, 'daemon.pid');
 
 		// Create a fake hosts file
-		fs.writeFileSync(hostsPath, '127.0.0.1 localhost\n::1 localhost\n', 'utf-8');
+		fs.writeFileSync(
+			hostsPath,
+			'127.0.0.1 localhost\n::1 localhost\n',
+			'utf-8',
+		);
 
 		handle = null;
 	});
@@ -91,10 +98,16 @@ describe('daemon server', () => {
 	it('adds and lists host entries', async () => {
 		startServer();
 
-		const addResp1 = await sendCommand(socketPath, { action: 'add', domain: 'app.local' });
+		const addResp1 = await sendCommand(socketPath, {
+			action: 'add',
+			domain: 'app.local',
+		});
 		expect(addResp1).toEqual({ ok: true });
 
-		const addResp2 = await sendCommand(socketPath, { action: 'add', domain: 'api.local' });
+		const addResp2 = await sendCommand(socketPath, {
+			action: 'add',
+			domain: 'api.local',
+		});
 		expect(addResp2).toEqual({ ok: true });
 
 		const listResp = await sendCommand(socketPath, { action: 'list' });
@@ -126,7 +139,10 @@ describe('daemon server', () => {
 		await sendCommand(socketPath, { action: 'add', domain: 'app.local' });
 		await sendCommand(socketPath, { action: 'add', domain: 'api.local' });
 
-		const removeResp = await sendCommand(socketPath, { action: 'remove', domain: 'app.local' });
+		const removeResp = await sendCommand(socketPath, {
+			action: 'remove',
+			domain: 'app.local',
+		});
 		expect(removeResp).toEqual({ ok: true });
 
 		const listResp = await sendCommand(socketPath, { action: 'list' });
@@ -163,9 +179,7 @@ describe('daemon server', () => {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 
 		// Socket should no longer accept connections
-		await expect(
-			sendCommand(socketPath, { action: 'ping' }),
-		).rejects.toThrow();
+		await expect(sendCommand(socketPath, { action: 'ping' })).rejects.toThrow();
 
 		// After shutdown, set handle to null so afterEach doesn't double-stop
 		handle = null;
@@ -177,7 +191,7 @@ describe('daemon server', () => {
 		await sendCommand(socketPath, { action: 'add', domain: 'app.local' });
 		await sendCommand(socketPath, { action: 'add', domain: 'api.local' });
 
-		await handle!.stop();
+		await handle?.stop();
 		handle = null;
 
 		const content = fs.readFileSync(hostsPath, 'utf-8');
@@ -190,7 +204,7 @@ describe('daemon server', () => {
 
 		expect(fs.existsSync(pidPath)).toBe(true);
 
-		await handle!.stop();
+		await handle?.stop();
 		handle = null;
 
 		expect(fs.existsSync(pidPath)).toBe(false);

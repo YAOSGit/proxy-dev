@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import type React from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import type { UseHostsReturn } from '../../hooks/useHosts/index.js';
 import { useHosts } from '../../hooks/useHosts/index.js';
-import { useRoutesContext } from '../RoutesProvider/index.js';
+import { ensureLeafCert, loadCA } from '../../ssl/index.js';
 import { getCertsDir, getLeavesDir } from '../../utils/platform/index.js';
-import { loadCA, ensureLeafCert } from '../../ssl/index.js';
+import { useRoutesContext } from '../RoutesProvider/index.js';
 import type { HostsProviderProps } from './HostsProvider.types.js';
 
 const HostsContext = createContext<UseHostsReturn | undefined>(undefined);
@@ -21,7 +22,7 @@ const HostsProvider: React.FC<HostsProviderProps> = ({ children }) => {
 	const { routes } = useRoutesContext();
 
 	useEffect(() => {
-		const domains = [...new Set(routes.map(r => r.domain))];
+		const domains = [...new Set(routes.map((r) => r.domain))];
 
 		const sync = async () => {
 			const certsDir = getCertsDir();
@@ -39,14 +40,18 @@ const HostsProvider: React.FC<HostsProviderProps> = ({ children }) => {
 
 				if (!hosts.activeDomains.includes(domain)) {
 					await hosts.addHost(domain).catch((err) => {
-						console.error(`[hosts] Failed to add ${domain}: ${err instanceof Error ? err.message : String(err)}`);
+						console.error(
+							`[hosts] Failed to add ${domain}: ${err instanceof Error ? err.message : String(err)}`,
+						);
 					});
 				}
 			}
 			for (const domain of hosts.activeDomains) {
 				if (!domains.includes(domain)) {
 					await hosts.removeHost(domain).catch((err) => {
-						console.error(`[hosts] Failed to remove ${domain}: ${err instanceof Error ? err.message : String(err)}`);
+						console.error(
+							`[hosts] Failed to remove ${domain}: ${err instanceof Error ? err.message : String(err)}`,
+						);
 					});
 				}
 			}
@@ -54,7 +59,9 @@ const HostsProvider: React.FC<HostsProviderProps> = ({ children }) => {
 		sync();
 	}, [routes, hosts]);
 
-	return <HostsContext.Provider value={hosts}>{children}</HostsContext.Provider>;
+	return (
+		<HostsContext.Provider value={hosts}>{children}</HostsContext.Provider>
+	);
 };
 
 export { HostsProvider, useHostsContext };

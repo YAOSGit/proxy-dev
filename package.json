@@ -1,91 +1,91 @@
 {
-  "name": "@yaos-git/proxy-dev",
-  "version": "126.0.0",
-  "description": "Local-first reverse proxy and interceptor with TUI dashboard",
-  "main": "dist/cli.js",
-  "exports": {
-    ".": "./dist/cli.js"
-  },
-  "bin": {
-    "proxy-dev": "dist/cli.js",
-    "proxy-dev-tui": "dist/editor-cli.js"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "run-tui -r \"^dev:\"",
-    "dev:typescript": "tsgo --watch --noEmit -p tsconfig.app.json",
-    "dev:test": "vitest --watch",
-    "build": "node esbuild.config.js",
-    "lint": "npm run lint:types && npm run lint:fix && npm run lint:format && npm run lint:audit",
-    "lint:check": "biome lint .",
-    "lint:fix": "biome check . --write",
-    "lint:format": "biome format . --write",
-    "lint:types": "tsgo --noEmit -p tsconfig.app.json",
-    "lint:audit": "npm audit",
-    "test": "npm run test:unit && npm run test:react && npm run test:types && npm run test:e2e",
-    "test:unit": "vitest run -c vitest.unit.config.ts",
-    "test:react": "vitest run -c vitest.react.config.ts",
-    "test:types": "vitest run -c vitest.type.config.ts",
-    "test:e2e": "npm run build && vitest run -c vitest.e2e.config.ts",
-    "coverage": "vitest run --coverage",
-    "size": "size-limit",
-    "prepublishOnly": "npm run lint:types && npm run lint:check && npm run test:unit && npm run test:react && npm run test:types && npm run test:e2e && npm run lint:audit && npm run build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/YAOSGit/proxy-dev.git"
-  },
-  "bugs": {
-    "url": "https://github.com/YAOSGit/proxy-dev/issues"
-  },
-  "homepage": "https://github.com/YAOSGit/proxy-dev#readme",
-  "keywords": [
-    "proxy",
-    "reverse-proxy",
-    "interceptor",
-    "tui",
-    "devtools",
-    "https",
-    "mock",
-    "cli"
-  ],
-  "author": {
-    "name": "Ygor de Paula",
-    "email": "ygorh.de.paula@gmail.com",
-    "url": "https://github.com/YAOSGit/proxy-dev"
-  },
-  "license": "ISC",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "type": "module",
-  "dependencies": {
-    "chalk": "^5.6.2",
-    "commander": "^14.0.3",
-    "zod": "^3.25.0"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.5",
-    "@inkjs/ui": "^2.0.0",
-    "@size-limit/file": "^11.2.0",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/node": "^25.0.1",
-    "@types/react": "^19.2.7",
-    "@typescript/native-preview": "^7.0.0-dev.20251216",
-    "@vitest/coverage-v8": "^4.0.15",
-    "@yaos-git/run-tui": "^126.0.0",
-    "esbuild": "^0.27.1",
-    "ink": "^6.5.1",
-    "ink-testing-library": "^4.0.0",
-    "jsdom": "^27.3.0",
-    "node-pty": "^1.0.0",
-    "react": "^19.2.3",
-    "size-limit": "^11.2.0",
-    "strip-ansi": "^7.1.2",
-    "ultracite": "^7.2.5",
-    "vitest": "^4.0.15"
-  }
+	"name": "@yaos-git/proxy-dev",
+	"version": "126.0.0",
+	"description": "Local-first reverse proxy and interceptor with TUI dashboard",
+	"main": "dist/cli.js",
+	"exports": {
+		".": "./dist/cli.js"
+	},
+	"bin": {
+		"proxy-dev": "dist/cli.js",
+		"proxy-dev-tui": "dist/editor-cli.js"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev": "run-tui -r \"^dev:\"",
+		"dev:typescript": "tsgo --watch --noEmit -p tsconfig.app.json",
+		"dev:test": "vitest --watch",
+		"build": "node esbuild.config.js",
+		"lint": "npm run lint:types && npm run lint:fix && npm run lint:format && npm run lint:audit",
+		"lint:check": "biome lint .",
+		"lint:fix": "biome check . --write",
+		"lint:format": "biome format . --write",
+		"lint:types": "tsgo --noEmit -p tsconfig.app.json",
+		"lint:audit": "npm audit",
+		"test": "npm run test:unit && npm run test:react && npm run test:types && npm run test:e2e",
+		"test:unit": "vitest run -c vitest.unit.config.ts",
+		"test:react": "vitest run -c vitest.react.config.ts",
+		"test:types": "vitest run -c vitest.type.config.ts",
+		"test:e2e": "npm run build && vitest run -c vitest.e2e.config.ts",
+		"coverage": "vitest run --coverage",
+		"size": "size-limit",
+		"prepublishOnly": "npm run lint:types && npm run lint:check && npm run test:unit && npm run test:react && npm run test:types && npm run test:e2e && npm run lint:audit && npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/YAOSGit/proxy-dev.git"
+	},
+	"bugs": {
+		"url": "https://github.com/YAOSGit/proxy-dev/issues"
+	},
+	"homepage": "https://github.com/YAOSGit/proxy-dev#readme",
+	"keywords": [
+		"proxy",
+		"reverse-proxy",
+		"interceptor",
+		"tui",
+		"devtools",
+		"https",
+		"mock",
+		"cli"
+	],
+	"author": {
+		"name": "Ygor de Paula",
+		"email": "ygorh.de.paula@gmail.com",
+		"url": "https://github.com/YAOSGit/proxy-dev"
+	},
+	"license": "ISC",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"type": "module",
+	"dependencies": {
+		"chalk": "^5.6.2",
+		"commander": "^14.0.3",
+		"zod": "^3.25.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.5",
+		"@inkjs/ui": "^2.0.0",
+		"@size-limit/file": "^11.2.0",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.0",
+		"@types/node": "^25.0.1",
+		"@types/react": "^19.2.7",
+		"@typescript/native-preview": "^7.0.0-dev.20251216",
+		"@vitest/coverage-v8": "^4.0.15",
+		"@yaos-git/run-tui": "^126.0.0",
+		"esbuild": "^0.27.1",
+		"ink": "^6.5.1",
+		"ink-testing-library": "^4.0.0",
+		"jsdom": "^27.3.0",
+		"node-pty": "^1.0.0",
+		"react": "^19.2.3",
+		"size-limit": "^11.2.0",
+		"strip-ansi": "^7.1.2",
+		"ultracite": "^7.2.5",
+		"vitest": "^4.0.15"
+	}
 }

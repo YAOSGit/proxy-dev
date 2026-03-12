@@ -2,7 +2,9 @@ import { Box, Text } from 'ink';
 import type { ControlBarProps } from './ControlBar.types.js';
 
 export function ControlBar({ commands, width }: ControlBarProps) {
-	const visibleCommands = commands.filter((cmd) => cmd.footer && cmd.isEnabled());
+	const visibleCommands = commands.filter(
+		(cmd) => cmd.footer && cmd.isEnabled(),
+	);
 
 	const terminalWidth = width ?? process.stdout.columns ?? 80;
 	const availableWidth = terminalWidth - 8;
@@ -15,7 +17,8 @@ export function ControlBar({ commands, width }: ControlBarProps) {
 	const truncatedCommands: typeof visibleCommands = [];
 	let hasMore = false;
 	for (const cmd of visibleCommands) {
-		const cmdWidth = 3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
+		const cmdWidth =
+			3 + String(cmd.displayKey).length + 1 + cmd.displayText.length;
 		const remaining = visibleCommands.length - truncatedCommands.length - 1;
 		const reserveForMore = remaining > 0 ? moreWidth : 0;
 		if (currentWidth + cmdWidth + reserveForMore <= availableWidth) {

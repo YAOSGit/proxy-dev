@@ -73,7 +73,7 @@ export function HelpMenu({ onClose }: HelpMenuProps) {
 			</Box>
 
 			<Box flexDirection="row" gap={4} justifyContent="center">
-				{HELP_SECTIONS.map((section, sectionIdx) => (
+				{HELP_SECTIONS.map((section, _sectionIdx) => (
 					<Box key={section.title} flexDirection="column" gap={1}>
 						<Text
 							bold

@@ -1,5 +1,5 @@
-import fs from 'node:fs';
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import { DaemonClient } from './client.js';
 
 const isDaemonRunning = async (socketPath: string): Promise<boolean> => {
@@ -33,7 +33,10 @@ const cleanStaleDaemon = (socketPath: string, pidPath: string): void => {
 	}
 };
 
-const waitForSocket = async (socketPath: string, timeoutMs = 3000): Promise<boolean> => {
+const waitForSocket = async (
+	socketPath: string,
+	timeoutMs = 3000,
+): Promise<boolean> => {
 	const start = Date.now();
 
 	while (Date.now() - start < timeoutMs) {
@@ -64,10 +67,14 @@ const spawnDaemon = async (
 
 	cleanStaleDaemon(socketPath, pidPath);
 
-	const child = spawn('sudo', ['--preserve-env=PROXY_DEV_SOCKET', process.execPath, daemonScriptPath], {
-		stdio: ['ignore', 'ignore', 'pipe'],
-		env: { ...process.env, PROXY_DEV_SOCKET: socketPath },
-	});
+	const child = spawn(
+		'sudo',
+		['--preserve-env=PROXY_DEV_SOCKET', process.execPath, daemonScriptPath],
+		{
+			stdio: ['ignore', 'ignore', 'pipe'],
+			env: { ...process.env, PROXY_DEV_SOCKET: socketPath },
+		},
+	);
 
 	let stderr = '';
 	child.stderr?.on('data', (data: Buffer) => {

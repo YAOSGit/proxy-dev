@@ -1,6 +1,9 @@
 import http from 'node:http';
 
-const VALID_CREDENTIALS = { email: 'alice@example.com', password: 'password123' };
+const VALID_CREDENTIALS = {
+	email: 'alice@example.com',
+	password: 'password123',
+};
 
 const server = http.createServer(async (req, res) => {
 	const url = new URL(req.url ?? '/', 'http://localhost:3001');
@@ -13,16 +16,27 @@ const server = http.createServer(async (req, res) => {
 		for await (const chunk of req) chunks.push(chunk);
 		const body = JSON.parse(Buffer.concat(chunks).toString());
 
-		if (body.email === VALID_CREDENTIALS.email && body.password === VALID_CREDENTIALS.password) {
+		if (
+			body.email === VALID_CREDENTIALS.email &&
+			body.password === VALID_CREDENTIALS.password
+		) {
 			res.writeHead(200);
-			res.end(JSON.stringify({
-				token: 'eyJhbGciOiJIUzI1NiJ9.' + Buffer.from(JSON.stringify({ sub: '1', name: 'Alice' })).toString('base64'),
-				expiresIn: 3600,
-				user: { id: 1, name: 'Alice', role: 'admin' },
-			}));
+			res.end(
+				JSON.stringify({
+					token:
+						'eyJhbGciOiJIUzI1NiJ9.' +
+						Buffer.from(JSON.stringify({ sub: '1', name: 'Alice' })).toString(
+							'base64',
+						),
+					expiresIn: 3600,
+					user: { id: 1, name: 'Alice', role: 'admin' },
+				}),
+			);
 		} else {
 			res.writeHead(401);
-			res.end(JSON.stringify({ error: 'Invalid credentials', code: 'AUTH_INVALID' }));
+			res.end(
+				JSON.stringify({ error: 'Invalid credentials', code: 'AUTH_INVALID' }),
+			);
 		}
 		return;
 	}
@@ -37,6 +51,8 @@ const server = http.createServer(async (req, res) => {
 	res.end(JSON.stringify({ error: 'Not found' }));
 });
 
-server.listen(3001, () => console.log('[auth] Listening on http://localhost:3001'));
+server.listen(3001, () =>
+	console.log('[auth] Listening on http://localhost:3001'),
+);
 process.on('SIGTERM', () => server.close());
 process.on('SIGINT', () => server.close());

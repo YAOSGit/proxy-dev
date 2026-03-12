@@ -4,9 +4,7 @@
 	"groups": {
 		"auth": {
 			"description": "Authentication service",
-			"routes": [
-				{ "domain": "auth.local", "target": 3001 }
-			]
+			"routes": [{ "domain": "auth.local", "target": 3001 }]
 		},
 		"api": {
 			"description": "Core API service",

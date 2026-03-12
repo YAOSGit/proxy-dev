@@ -31,6 +31,8 @@ const server = http.createServer((req, res) => {
 	res.end(html);
 });
 
-server.listen(3003, () => console.log('[web] Listening on http://localhost:3003'));
+server.listen(3003, () =>
+	console.log('[web] Listening on http://localhost:3003'),
+);
 process.on('SIGTERM', () => server.close());
 process.on('SIGINT', () => server.close());

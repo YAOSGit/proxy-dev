@@ -1,7 +1,8 @@
+import path from 'node:path';
 import { Box, useInput, useStdout } from 'ink';
 import { useEffect, useState } from 'react';
-import { ControlBar } from '../components/ControlBar/index.js';
 import { ConfirmDialog } from '../components/ConfirmDialog/index.js';
+import { ControlBar } from '../components/ControlBar/index.js';
 import { DetailInspector } from '../components/DetailInspector/index.js';
 import { HelpMenu } from '../components/HelpMenu/index.js';
 import { LatencyInput } from '../components/LatencyInput/index.js';
@@ -10,17 +11,21 @@ import { RouteConfig } from '../components/RouteConfig/index.js';
 import { SummaryBar } from '../components/SummaryBar/index.js';
 import { SystemHeader } from '../components/SystemHeader/index.js';
 import { TrafficTable } from '../components/TrafficTable/index.js';
-import { useTrafficContext } from '../providers/TrafficProvider/index.js';
-import { useRoutesContext } from '../providers/RoutesProvider/index.js';
-import { useUIStateContext } from '../providers/UIStateProvider/index.js';
 import { useHostsContext } from '../providers/HostsProvider/index.js';
 import { useProxyContext } from '../providers/ProxyProvider/index.js';
+import { useRoutesContext } from '../providers/RoutesProvider/index.js';
+import { useTrafficContext } from '../providers/TrafficProvider/index.js';
+import { useUIStateContext } from '../providers/UIStateProvider/index.js';
 import { checkTrustStatus } from '../ssl/index.js';
-import { getCertsDir, getLeavesDir } from '../utils/platform/index.js';
-import { getConfigWarnings } from '../utils/config/index.js';
-import { buildMockFilePath, defaultVariantName, writeMockFile, addMockToLocalConfig } from '../utils/snapshot/index.js';
-import path from 'node:path';
 import type { Command } from '../types/Command/index.js';
+import { getConfigWarnings } from '../utils/config/index.js';
+import { getCertsDir, getLeavesDir } from '../utils/platform/index.js';
+import {
+	addMockToLocalConfig,
+	buildMockFilePath,
+	defaultVariantName,
+	writeMockFile,
+} from '../utils/snapshot/index.js';
 
 declare const __CLI_VERSION__: string;
 
@@ -65,10 +70,15 @@ export function AppContent() {
 		} else if (proxy.status === 'running' && routes.resolved) {
 			proxy.updateRoutes(routes.resolved);
 		}
-	}, [proxy.status, routes.resolved]);
+	}, [proxy.status, routes.resolved, proxy.startProxy, proxy.updateRoutes]);
 
 	const selectedEntry = traffic.getSelectedEntry();
-	const isOverlayOpen = ui.showConfirm || ui.showMockPicker || ui.showLatencyInput || ui.showRouteConfig || ui.showHelp;
+	const isOverlayOpen =
+		ui.showConfirm ||
+		ui.showMockPicker ||
+		ui.showLatencyInput ||
+		ui.showRouteConfig ||
+		ui.showHelp;
 
 	// Build commands — order matters: first match in the loop wins.
 	// Overlay-specific commands go before general commands so they take priority.
@@ -153,7 +163,7 @@ export function AppContent() {
 			isEnabled: () => ui.showLatencyInput,
 			execute: () => {
 				const ms = parseInt(latencyInput, 10);
-				if (!isNaN(ms)) {
+				if (!Number.isNaN(ms)) {
 					routes.setGlobalLatency(ms);
 				}
 				ui.closeLatencyInput();
@@ -168,7 +178,8 @@ export function AppContent() {
 			displayText: 'up',
 			footer: true,
 			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic',
-			execute: () => traffic.selectIndex(Math.max(0, traffic.selectedIndex - 1)),
+			execute: () =>
+				traffic.selectIndex(Math.max(0, traffic.selectedIndex - 1)),
 		},
 		{
 			id: 'navigate-down',
@@ -177,7 +188,10 @@ export function AppContent() {
 			displayText: 'down',
 			footer: true,
 			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic',
-			execute: () => traffic.selectIndex(Math.min(traffic.entries.length - 1, traffic.selectedIndex + 1)),
+			execute: () =>
+				traffic.selectIndex(
+					Math.min(traffic.entries.length - 1, traffic.selectedIndex + 1),
+				),
 		},
 		{
 			id: 'inspect',
@@ -185,7 +199,8 @@ export function AppContent() {
 			displayKey: 'Enter',
 			displayText: 'inspect',
 			footer: true,
-			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic' && selectedEntry !== null,
+			isEnabled: () =>
+				!isOverlayOpen && ui.viewLevel === 'traffic' && selectedEntry !== null,
 			execute: () => ui.openDetail(),
 		},
 
@@ -196,7 +211,13 @@ export function AppContent() {
 			displayKey: 'Esc',
 			displayText: 'back',
 			footer: true,
-			isEnabled: () => ui.viewLevel === 'detail' || ui.showMockPicker || ui.showLatencyInput || ui.showHelp || ui.showRouteConfig || ui.showConfirm,
+			isEnabled: () =>
+				ui.viewLevel === 'detail' ||
+				ui.showMockPicker ||
+				ui.showLatencyInput ||
+				ui.showHelp ||
+				ui.showRouteConfig ||
+				ui.showConfirm,
 			execute: () => {
 				if (ui.showConfirm) ui.closeConfirm();
 				else if (ui.showHelp) ui.closeHelp();
@@ -243,7 +264,8 @@ export function AppContent() {
 			displayKey: 'm',
 			displayText: 'mock',
 			footer: true,
-			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic' && selectedEntry !== null,
+			isEnabled: () =>
+				!isOverlayOpen && ui.viewLevel === 'traffic' && selectedEntry !== null,
 			execute: () => ui.openMockPicker(),
 		},
 		{
@@ -253,7 +275,10 @@ export function AppContent() {
 			displayText: 'latency',
 			footer: true,
 			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic',
-			execute: () => { setLatencyInput(''); ui.openLatencyInput(); },
+			execute: () => {
+				setLatencyInput('');
+				ui.openLatencyInput();
+			},
 		},
 		{
 			id: 'help',
@@ -281,17 +306,35 @@ export function AppContent() {
 			displayKey: 's',
 			displayText: 'snapshot',
 			footer: true,
-			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic' && selectedEntry !== null && selectedEntry.responseBody !== undefined,
+			isEnabled: () =>
+				!isOverlayOpen &&
+				ui.viewLevel === 'traffic' &&
+				selectedEntry !== null &&
+				selectedEntry.responseBody !== undefined,
 			execute: () => {
 				if (!selectedEntry) return;
 				try {
 					const variantName = defaultVariantName(selectedEntry.status);
-					const filePath = buildMockFilePath(selectedEntry.domain, selectedEntry.path, variantName);
-					writeMockFile(filePath, selectedEntry.responseBody ?? '', selectedEntry.status, selectedEntry.responseHeaders);
-					addMockToLocalConfig('proxy-dev.json', `${selectedEntry.domain}${selectedEntry.path || ''}`, variantName, {
-						file: `./${filePath}`,
-						status: selectedEntry.status,
-					});
+					const filePath = buildMockFilePath(
+						selectedEntry.domain,
+						selectedEntry.path,
+						variantName,
+					);
+					writeMockFile(
+						filePath,
+						selectedEntry.responseBody ?? '',
+						selectedEntry.status,
+						selectedEntry.responseHeaders,
+					);
+					addMockToLocalConfig(
+						'proxy-dev.json',
+						`${selectedEntry.domain}${selectedEntry.path || ''}`,
+						variantName,
+						{
+							file: `./${filePath}`,
+							status: selectedEntry.status,
+						},
+					);
 					routes.reload();
 				} catch (err) {
 					const msg = err instanceof Error ? err.message : String(err);
@@ -305,7 +348,10 @@ export function AppContent() {
 			displayKey: 'x',
 			displayText: 'clear',
 			footer: true,
-			isEnabled: () => !isOverlayOpen && ui.viewLevel === 'traffic' && traffic.entries.length > 0,
+			isEnabled: () =>
+				!isOverlayOpen &&
+				ui.viewLevel === 'traffic' &&
+				traffic.entries.length > 0,
 			execute: () => traffic.clear(),
 		},
 
@@ -328,14 +374,27 @@ export function AppContent() {
 			displayText: 'quit',
 			footer: true,
 			isEnabled: () => !ui.showConfirm,
-			execute: () => ui.openConfirm('Are you sure you want to quit proxy-dev?', () => process.exit(0)),
+			execute: () =>
+				ui.openConfirm('Are you sure you want to quit proxy-dev?', () =>
+					process.exit(0),
+				),
 		},
 	];
 
 	useInput((input, key) => {
 		for (const cmd of commands) {
 			if (!cmd.isEnabled()) continue;
-			const pressed = key.return ? 'return' : key.escape ? 'escape' : key.tab ? 'tab' : key.upArrow ? 'upArrow' : key.downArrow ? 'downArrow' : input;
+			const pressed = key.return
+				? 'return'
+				: key.escape
+					? 'escape'
+					: key.tab
+						? 'tab'
+						: key.upArrow
+							? 'upArrow'
+							: key.downArrow
+								? 'downArrow'
+								: input;
 			if (cmd.keys.includes(pressed)) {
 				cmd.execute();
 				return;
@@ -361,12 +420,14 @@ export function AppContent() {
 		if (ui.showRouteConfig) {
 			// In local mode, build a virtual GlobalConfig from local groups
 			// so RouteConfig edits save to proxy-dev.json instead of global config
-			const configForRoutes = routes.mode === 'local'
-				? { ...routes.global, groups: routes.local?.groups ?? {} }
-				: routes.global;
-			const updateForRoutes = routes.mode === 'local'
-				? (g: typeof routes.global) => routes.updateLocalGroups(g.groups)
-				: routes.updateGlobal;
+			const configForRoutes =
+				routes.mode === 'local'
+					? { ...routes.global, groups: routes.local?.groups ?? {} }
+					: routes.global;
+			const updateForRoutes =
+				routes.mode === 'local'
+					? (g: typeof routes.global) => routes.updateLocalGroups(g.groups)
+					: routes.updateGlobal;
 			return (
 				<RouteConfig
 					global={configForRoutes}
@@ -381,7 +442,9 @@ export function AppContent() {
 		}
 
 		if (ui.showMockPicker && selectedEntry) {
-			const routeKey = selectedEntry.path ? `${selectedEntry.domain}${selectedEntry.path}` : selectedEntry.domain;
+			const routeKey = selectedEntry.path
+				? `${selectedEntry.domain}${selectedEntry.path}`
+				: selectedEntry.domain;
 			const mockRoute = routes.mocks[routeKey] ?? null;
 			return (
 				<MockPicker

@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, it, expect, afterEach } from 'vitest';
-import { startDaemonServer } from './server.js';
-import { isDaemonRunning, cleanStaleDaemon } from './spawner.js';
+import { afterEach, describe, expect, it } from 'vitest';
 import type { DaemonServerHandle } from './server.js';
+import { startDaemonServer } from './server.js';
+import { cleanStaleDaemon, isDaemonRunning } from './spawner.js';
 
 describe('spawner', () => {
 	let tmpDir: string;

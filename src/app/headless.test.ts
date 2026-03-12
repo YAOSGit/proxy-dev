@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { formatLogLine } from './headless.js';
+import { describe, expect, it } from 'vitest';
 import type { TrafficEntry } from '../types/Traffic/index.js';
+import { formatLogLine } from './headless.js';
 
 const makeEntry = (overrides: Partial<TrafficEntry> = {}): TrafficEntry => ({
 	id: '1',
@@ -26,18 +26,22 @@ describe('formatLogLine', () => {
 	});
 
 	it('includes mock tag for MOCK entries', () => {
-		const line = formatLogLine(makeEntry({
-			routeState: 'MOCK',
-			mockVariant: 'success',
-		}));
+		const line = formatLogLine(
+			makeEntry({
+				routeState: 'MOCK',
+				mockVariant: 'success',
+			}),
+		);
 		expect(line).toContain('[MOCK:success]');
 	});
 
 	it('uses ? for MOCK entries without a variant name', () => {
-		const line = formatLogLine(makeEntry({
-			routeState: 'MOCK',
-			mockVariant: undefined,
-		}));
+		const line = formatLogLine(
+			makeEntry({
+				routeState: 'MOCK',
+				mockVariant: undefined,
+			}),
+		);
 		expect(line).toContain('[MOCK:?]');
 	});
 });

@@ -1,74 +1,92 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { addMockToLocalConfig, buildMockFilePath, readMockFile, writeMockFile, defaultVariantName } from '../src/utils/snapshot/index.js';
+import {
+	addMockToLocalConfig,
+	buildMockFilePath,
+	defaultVariantName,
+	readMockFile,
+	writeMockFile,
+} from '../src/utils/snapshot/index.js';
 import { createTempDir } from './utils/index.js';
 
 describe('mock system E2E', () => {
-    let tmpDir: string;
-    let cleanup: () => void;
+	let tmpDir: string;
+	let cleanup: () => void;
 
-    beforeEach(() => {
-        const tmp = createTempDir();
-        tmpDir = tmp.dir;
-        cleanup = tmp.cleanup;
-    });
+	beforeEach(() => {
+		const tmp = createTempDir();
+		tmpDir = tmp.dir;
+		cleanup = tmp.cleanup;
+	});
 
-    afterEach(() => {
-        cleanup();
-    });
+	afterEach(() => {
+		cleanup();
+	});
 
-    it('full snapshot flow: write, read, add to config', () => {
-        // Build file path
-        const filePath = path.join(tmpDir, ...buildMockFilePath('api.local', '/users', 'success').split('/'));
-        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(tmpDir, filePath);
+	it('full snapshot flow: write, read, add to config', () => {
+		// Build file path
+		const filePath = path.join(
+			tmpDir,
+			...buildMockFilePath('api.local', '/users', 'success').split('/'),
+		);
+		const _fullPath = path.isAbsolute(filePath)
+			? filePath
+			: path.join(tmpDir, filePath);
 
-        const mockFilePath = path.join(tmpDir, 'mocks', 'api.local', 'users', 'success.json');
+		const mockFilePath = path.join(
+			tmpDir,
+			'mocks',
+			'api.local',
+			'users',
+			'success.json',
+		);
 
-        // Write mock
-        writeMockFile(mockFilePath, '{"users":[{"id":1,"name":"Alice"}]}', 200, { 'Content-Type': 'application/json' });
-        expect(fs.existsSync(mockFilePath)).toBe(true);
+		// Write mock
+		writeMockFile(mockFilePath, '{"users":[{"id":1,"name":"Alice"}]}', 200, {
+			'Content-Type': 'application/json',
+		});
+		expect(fs.existsSync(mockFilePath)).toBe(true);
 
-        // Read mock back
-        const { body, status } = readMockFile(mockFilePath);
-        expect(status).toBe(200);
-        expect(JSON.parse(body)).toHaveProperty('users');
+		// Read mock back
+		const { body, status } = readMockFile(mockFilePath);
+		expect(status).toBe(200);
+		expect(JSON.parse(body)).toHaveProperty('users');
 
-        // Add to local config
-        const configPath = path.join(tmpDir, 'proxy-dev.json');
-        addMockToLocalConfig(configPath, 'api.local/users', 'success', {
-            file: mockFilePath,
-            status: 200,
-        });
+		// Add to local config
+		const configPath = path.join(tmpDir, 'proxy-dev.json');
+		addMockToLocalConfig(configPath, 'api.local/users', 'success', {
+			file: mockFilePath,
+			status: 200,
+		});
 
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        expect(config.mocks['api.local/users'].variants.success).toBeDefined();
-    });
+		const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+		expect(config.mocks['api.local/users'].variants.success).toBeDefined();
+	});
 
-    it('defaultVariantName uses correct naming', () => {
-        expect(defaultVariantName(200)).toBe('success');
-        expect(defaultVariantName(201)).toBe('success');
-        expect(defaultVariantName(500)).toBe('error-500');
-        expect(defaultVariantName(404)).toBe('error-404');
-    });
+	it('defaultVariantName uses correct naming', () => {
+		expect(defaultVariantName(200)).toBe('success');
+		expect(defaultVariantName(201)).toBe('success');
+		expect(defaultVariantName(500)).toBe('error-500');
+		expect(defaultVariantName(404)).toBe('error-404');
+	});
 
-    it('multiple variants can coexist', () => {
-        const configPath = path.join(tmpDir, 'proxy-dev.json');
+	it('multiple variants can coexist', () => {
+		const configPath = path.join(tmpDir, 'proxy-dev.json');
 
-        addMockToLocalConfig(configPath, 'api.local/users', 'success', {
-            file: './mocks/api.local/users/success.json',
-            status: 200,
-        });
-        addMockToLocalConfig(configPath, 'api.local/users', 'error-500', {
-            file: './mocks/api.local/users/error-500.json',
-            status: 500,
-        });
+		addMockToLocalConfig(configPath, 'api.local/users', 'success', {
+			file: './mocks/api.local/users/success.json',
+			status: 200,
+		});
+		addMockToLocalConfig(configPath, 'api.local/users', 'error-500', {
+			file: './mocks/api.local/users/error-500.json',
+			status: 500,
+		});
 
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        const variants = config.mocks['api.local/users'].variants;
-        expect(Object.keys(variants)).toHaveLength(2);
-        expect(variants.success.status).toBe(200);
-        expect(variants['error-500'].status).toBe(500);
-    });
+		const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+		const variants = config.mocks['api.local/users'].variants;
+		expect(Object.keys(variants)).toHaveLength(2);
+		expect(variants.success.status).toBe(200);
+		expect(variants['error-500'].status).toBe(500);
+	});
 });

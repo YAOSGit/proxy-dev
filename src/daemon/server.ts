@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import net from 'node:net';
-import type { DaemonCommand, DaemonResponse } from '../types/Ipc/index.js';
 import {
 	addEntry,
 	getProxyDevEntries,
-	removeEntry,
 	removeAllProxyDevEntries,
+	removeEntry,
 } from '../hosts/parser.js';
+import type { DaemonCommand, DaemonResponse } from '../types/Ipc/index.js';
 
 interface DaemonServerConfig {
 	socketPath: string;
@@ -18,7 +18,10 @@ interface DaemonServerHandle {
 	stop: () => Promise<void>;
 }
 
-const handleCommand = (command: DaemonCommand, hostsPath: string): DaemonResponse => {
+const handleCommand = (
+	command: DaemonCommand,
+	hostsPath: string,
+): DaemonResponse => {
 	switch (command.action) {
 		case 'ping': {
 			return { ok: true };
@@ -52,7 +55,10 @@ const handleCommand = (command: DaemonCommand, hostsPath: string): DaemonRespons
 		}
 
 		default: {
-			return { ok: false, error: `Unknown action: ${(command as { action: string }).action}` };
+			return {
+				ok: false,
+				error: `Unknown action: ${(command as { action: string }).action}`,
+			};
 		}
 	}
 };
@@ -84,10 +90,11 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 				return;
 			}
 
-			let newlineIdx: number;
-			while ((newlineIdx = buffer.indexOf('\n')) !== -1) {
+			let newlineIdx: number = buffer.indexOf('\n');
+			while (newlineIdx !== -1) {
 				const line = buffer.slice(0, newlineIdx);
 				buffer = buffer.slice(newlineIdx + 1);
+				newlineIdx = buffer.indexOf('\n');
 
 				if (line.trim().length === 0) continue;
 
@@ -96,13 +103,13 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 					command = JSON.parse(line) as DaemonCommand;
 				} catch {
 					const errResp: DaemonResponse = { ok: false, error: 'Invalid JSON' };
-					socket.write(JSON.stringify(errResp) + '\n');
+					socket.write(`${JSON.stringify(errResp)}\n`);
 					continue;
 				}
 
 				if (command.action === 'shutdown') {
 					const resp: DaemonResponse = { ok: true };
-					socket.write(JSON.stringify(resp) + '\n');
+					socket.write(`${JSON.stringify(resp)}\n`);
 					// Schedule cleanup + close after writing the response
 					setImmediate(() => {
 						void cleanup();
@@ -115,9 +122,12 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 					response = handleCommand(command, hostsPath);
 				} catch (err) {
 					const msg = err instanceof Error ? err.message : String(err);
-					response = { ok: false, error: `Command "${command.action}" failed: ${msg}` };
+					response = {
+						ok: false,
+						error: `Command "${command.action}" failed: ${msg}`,
+					};
 				}
-				socket.write(JSON.stringify(response) + '\n');
+				socket.write(`${JSON.stringify(response)}\n`);
 			}
 		});
 	});
@@ -127,7 +137,9 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 		try {
 			fs.chmodSync(config.socketPath, 0o666);
 		} catch (err) {
-			console.error(`[daemon] Failed to chmod socket: ${err instanceof Error ? err.message : String(err)}`);
+			console.error(
+				`[daemon] Failed to chmod socket: ${err instanceof Error ? err.message : String(err)}`,
+			);
 		}
 	});
 
@@ -143,7 +155,9 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			console.error(`[daemon] Failed to clean /etc/hosts on shutdown: ${msg}`);
-			console.error(`[daemon] You may need to manually remove proxy-dev entries from ${hostsPath}`);
+			console.error(
+				`[daemon] You may need to manually remove proxy-dev entries from ${hostsPath}`,
+			);
 		}
 
 		// Close the server
@@ -152,17 +166,25 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 		});
 
 		// Remove socket file
-		try { fs.unlinkSync(config.socketPath); } catch (err) {
+		try {
+			fs.unlinkSync(config.socketPath);
+		} catch (err) {
 			if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-				console.error(`[daemon] Failed to remove socket: ${(err as Error).message}`);
+				console.error(
+					`[daemon] Failed to remove socket: ${(err as Error).message}`,
+				);
 			}
 		}
 
 		// Remove PID file
 		if (config.pidPath) {
-			try { fs.unlinkSync(config.pidPath); } catch (err) {
+			try {
+				fs.unlinkSync(config.pidPath);
+			} catch (err) {
 				if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-					console.error(`[daemon] Failed to remove PID file: ${(err as Error).message}`);
+					console.error(
+						`[daemon] Failed to remove PID file: ${(err as Error).message}`,
+					);
 				}
 			}
 		}

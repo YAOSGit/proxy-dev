@@ -1,9 +1,20 @@
 import { Box, Text } from 'ink';
-import React, { Component } from 'react';
-import type { ErrorBoundaryProps, ErrorBoundaryState } from './ErrorBoundary.types.js';
+import type React from 'react';
+import { Component } from 'react';
+import type {
+	ErrorBoundaryProps,
+	ErrorBoundaryState,
+} from './ErrorBoundary.types.js';
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-	state: ErrorBoundaryState = { hasError: false, error: null, componentStack: null };
+export class ErrorBoundary extends Component<
+	ErrorBoundaryProps,
+	ErrorBoundaryState
+> {
+	state: ErrorBoundaryState = {
+		hasError: false,
+		error: null,
+		componentStack: null,
+	};
 
 	static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
 		return { hasError: true, error };
@@ -13,7 +24,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 		console.error('[ErrorBoundary] Uncaught error:', error);
 		if (errorInfo.componentStack) {
 			this.setState({ componentStack: errorInfo.componentStack });
-			console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
+			console.error(
+				'[ErrorBoundary] Component stack:',
+				errorInfo.componentStack,
+			);
 		}
 	}
 
@@ -21,7 +35,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 		if (this.state.hasError) {
 			return (
 				this.props.fallback ?? (
-					<Box flexDirection="column" borderStyle="round" borderColor="red" paddingX={1} paddingY={1}>
+					<Box
+						flexDirection="column"
+						borderStyle="round"
+						borderColor="red"
+						paddingX={1}
+						paddingY={1}
+					>
 						<Text bold color="red">
 							Something went wrong
 						</Text>
@@ -30,12 +50,22 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 						</Box>
 						{this.state.componentStack && (
 							<Box marginTop={1} flexDirection="column">
-								<Text bold dimColor>Stack:</Text>
-								<Text dimColor>{this.state.componentStack.trim().split('\n').slice(0, 5).join('\n')}</Text>
+								<Text bold dimColor>
+									Stack:
+								</Text>
+								<Text dimColor>
+									{this.state.componentStack
+										.trim()
+										.split('\n')
+										.slice(0, 5)
+										.join('\n')}
+								</Text>
 							</Box>
 						)}
 						<Box marginTop={1}>
-							<Text dimColor>Press 'q' to quit. Full details logged to stderr.</Text>
+							<Text dimColor>
+								Press 'q' to quit. Full details logged to stderr.
+							</Text>
 						</Box>
 					</Box>
 				)

@@ -1,7 +1,15 @@
 import { useCallback, useState } from 'react';
-import type { ConfigMode, ConfigSource, GlobalConfig, LocalConfig, ResolvedConfig, ResolvedRoute, TaggedRouteGroup } from '../../types/Config/index.js';
-import type { MockRoute } from '../../types/Mock/index.js';
+import type {
+	ConfigMode,
+	ConfigSource,
+	GlobalConfig,
+	LocalConfig,
+	ResolvedConfig,
+	ResolvedRoute,
+	TaggedRouteGroup,
+} from '../../types/Config/index.js';
 import type { LatencyConfig } from '../../types/Latency/index.js';
+import type { MockRoute } from '../../types/Mock/index.js';
 import {
 	loadGlobalConfig,
 	loadLocalConfig,
@@ -35,30 +43,49 @@ type UseRoutesReturn = {
 	updateGlobal: (global: GlobalConfig) => void;
 	updateLocalGroups: (groups: GlobalConfig['groups']) => void;
 	setMockVariant: (routeKey: string, variantName: string | null) => void;
-	setRouteLatency: (domain: string, path: string | undefined, ms: number | undefined) => void;
+	setRouteLatency: (
+		domain: string,
+		path: string | undefined,
+		ms: number | undefined,
+	) => void;
 	setGlobalLatency: (ms: number) => void;
 };
 
 const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
-	const tagGroups = (
-		groups: Record<string, { description?: string; routes: Array<{ domain: string; path?: string; target: number; latencyMs?: number; httpsUpgrade?: boolean }> }>,
-		source: ConfigSource,
-		prefix: boolean,
-	): Record<string, TaggedRouteGroup> => {
-		const tagged: Record<string, TaggedRouteGroup> = {};
-		for (const [name, group] of Object.entries(groups)) {
-			const key = prefix ? `${source}:${name}` : name;
-			tagged[key] = {
-				source,
-				originalName: name,
-				description: group.description,
-				routes: group.routes,
-			};
-		}
-		return tagged;
-	};
+	const tagGroups = useCallback(
+		(
+			groups: Record<
+				string,
+				{
+					description?: string;
+					routes: Array<{
+						domain: string;
+						path?: string;
+						target: number;
+						latencyMs?: number;
+						httpsUpgrade?: boolean;
+					}>;
+				}
+			>,
+			source: ConfigSource,
+			prefix: boolean,
+		): Record<string, TaggedRouteGroup> => {
+			const tagged: Record<string, TaggedRouteGroup> = {};
+			for (const [name, group] of Object.entries(groups)) {
+				const key = prefix ? `${source}:${name}` : name;
+				tagged[key] = {
+					source,
+					originalName: name,
+					description: group.description,
+					routes: group.routes,
+				};
+			}
+			return tagged;
+		},
+		[],
+	);
 
-	const loadState = (): RouteState => {
+	const loadState = useCallback((): RouteState => {
 		const global = loadGlobalConfig();
 		const local = loadLocalConfig();
 
@@ -74,13 +101,19 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 		} else {
 			effectiveGroups = { ...global.groups, ...(local?.groups ?? {}) };
 			const globalTagged = tagGroups(global.groups, 'global', true);
-			const localTagged = local ? tagGroups(local.groups ?? {}, 'local', true) : {};
+			const localTagged = local
+				? tagGroups(local.groups ?? {}, 'local', true)
+				: {};
 			taggedGroups = { ...globalTagged, ...localTagged };
 		}
 
-		const effectiveGlobal: GlobalConfig = { ...global, groups: effectiveGroups };
+		const effectiveGlobal: GlobalConfig = {
+			...global,
+			groups: effectiveGroups,
+		};
 		const routes = resolveRoutes(effectiveGlobal, local);
-		const latency = mode === 'global' ? global.latency : (local?.latency ?? global.latency);
+		const latency =
+			mode === 'global' ? global.latency : (local?.latency ?? global.latency);
 		const mocks = mode === 'global' ? {} : (local?.mocks ?? {});
 
 		const resolved: ResolvedConfig = {
@@ -100,16 +133,18 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			mocks,
 			resolved,
 		};
-	};
+	}, [mode, tagGroups]);
 
 	const [state, setState] = useState<RouteState>(loadState);
 
-	const reload = useCallback(() => setState(loadState()), []);
+	const reload = useCallback(() => setState(loadState()), [loadState]);
 
 	const toggleGroup = useCallback(
 		(groupName: string) => {
 			const local = state.local ?? { mocks: {} };
-			const active = new Set(local.activeGroups ?? Object.keys(state.global.groups));
+			const active = new Set(
+				local.activeGroups ?? Object.keys(state.global.groups),
+			);
 			if (active.has(groupName)) {
 				active.delete(groupName);
 			} else {
@@ -119,7 +154,7 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			saveLocalConfig(updated);
 			setState(loadState());
 		},
-		[state],
+		[state, loadState],
 	);
 
 	const setMockVariant = useCallback(
@@ -127,14 +162,14 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			const local = state.local ?? { mocks: {} };
 			const mocks = { ...local.mocks };
 			if (!mocks[routeKey]) mocks[routeKey] = { variants: {} };
-			const mockRoute = { ...mocks[routeKey]! };
+			const mockRoute = { ...(mocks[routeKey] as (typeof mocks)[string]) };
 			mockRoute.active = variantName ?? undefined;
 			mocks[routeKey] = mockRoute;
 			const updated: LocalConfig = { ...local, mocks };
 			saveLocalConfig(updated);
 			setState(loadState());
 		},
-		[state],
+		[state, loadState],
 	);
 
 	const setRouteLatency = useCallback(
@@ -150,7 +185,7 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			saveGlobalConfig(global);
 			setState(loadState());
 		},
-		[state],
+		[state, loadState],
 	);
 
 	const setGlobalLatency = useCallback(
@@ -159,7 +194,7 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			saveGlobalConfig(global);
 			setState(loadState());
 		},
-		[state],
+		[state, loadState],
 	);
 
 	const updateGlobal = useCallback(
@@ -167,7 +202,7 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			saveGlobalConfig(global);
 			setState(loadState());
 		},
-		[],
+		[loadState],
 	);
 
 	const updateLocalGroups = useCallback(
@@ -177,7 +212,7 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 			saveLocalConfig(updated);
 			setState(loadState());
 		},
-		[state],
+		[state, loadState],
 	);
 
 	return {

@@ -9,12 +9,17 @@ const db = {
 	products: [
 		{ id: 101, name: 'Widget', price: 9.99, stock: 42 },
 		{ id: 102, name: 'Gadget', price: 24.99, stock: 7 },
-		{ id: 103, name: 'Doohickey', price: 14.50, stock: 0 },
+		{ id: 103, name: 'Doohickey', price: 14.5, stock: 0 },
 	],
 };
 
 const routes = {
-	'/users': () => ({ users: db.users, total: db.users.length, page: 1, pageSize: 20 }),
+	'/users': () => ({
+		users: db.users,
+		total: db.users.length,
+		page: 1,
+		pageSize: 20,
+	}),
 	'/products': () => ({ products: db.products, total: db.products.length }),
 	'/health': () => ({ service: 'api', status: 'ok', uptime: process.uptime() }),
 };

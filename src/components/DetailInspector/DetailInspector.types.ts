@@ -1,5 +1,5 @@
-import type { TrafficEntry } from '../../types/Traffic/index.js';
 import type { DetailPane } from '../../hooks/useUIState/index.js';
+import type { TrafficEntry } from '../../types/Traffic/index.js';
 
 interface DetailInspectorProps {
 	entry: TrafficEntry;

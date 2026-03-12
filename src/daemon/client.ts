@@ -23,7 +23,7 @@ class DaemonClient {
 			}, 5000);
 
 			socket.on('connect', () => {
-				socket.write(JSON.stringify(command) + '\n');
+				socket.write(`${JSON.stringify(command)}\n`);
 			});
 
 			socket.on('data', (data) => {

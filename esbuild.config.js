@@ -11,69 +11,69 @@ const require = createRequire(import.meta.url);
 `;
 
 const sharedConfig = {
-    bundle: true,
-    platform: 'node',
-    format: 'esm',
-    minify: true,
-    tsconfig: 'tsconfig.app.json',
-    external: [...builtinModules.map((m) => `node:${m}`)],
-    banner: {
-        js: requireShim,
-    },
-    define: {
-        __CLI_VERSION__: JSON.stringify(version),
-    },
-    supported: {
-        'top-level-await': true,
-    },
-    plugins: [
-        {
-            name: 'node-builtins-to-node-prefix',
-            setup(build) {
-                const filter = new RegExp(`^(${builtinModules.join('|')})$`);
-                build.onResolve({ filter }, (args) => ({
-                    path: `node:${args.path}`,
-                    external: true,
-                }));
-            },
-        },
-        {
-            name: 'stub-react-devtools',
-            setup(build) {
-                build.onResolve({ filter: /^react-devtools-core$/ }, () => ({
-                    path: 'react-devtools-core',
-                    namespace: 'stub',
-                }));
-                build.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({
-                    contents: 'export default undefined;',
-                    loader: 'js',
-                }));
-            },
-        },
-    ],
-    mainFields: ['module', 'main'],
-    conditions: ['import', 'node'],
+	bundle: true,
+	platform: 'node',
+	format: 'esm',
+	minify: true,
+	tsconfig: 'tsconfig.app.json',
+	external: [...builtinModules.map((m) => `node:${m}`)],
+	banner: {
+		js: requireShim,
+	},
+	define: {
+		__CLI_VERSION__: JSON.stringify(version),
+	},
+	supported: {
+		'top-level-await': true,
+	},
+	plugins: [
+		{
+			name: 'node-builtins-to-node-prefix',
+			setup(build) {
+				const filter = new RegExp(`^(${builtinModules.join('|')})$`);
+				build.onResolve({ filter }, (args) => ({
+					path: `node:${args.path}`,
+					external: true,
+				}));
+			},
+		},
+		{
+			name: 'stub-react-devtools',
+			setup(build) {
+				build.onResolve({ filter: /^react-devtools-core$/ }, () => ({
+					path: 'react-devtools-core',
+					namespace: 'stub',
+				}));
+				build.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({
+					contents: 'export default undefined;',
+					loader: 'js',
+				}));
+			},
+		},
+	],
+	mainFields: ['module', 'main'],
+	conditions: ['import', 'node'],
 };
 
 // Build CLI (lean, no React)
 await esbuild.build({
-    ...sharedConfig,
-    entryPoints: ['src/app/cli.ts'],
-    outfile: 'dist/cli.js',
+	...sharedConfig,
+	entryPoints: ['src/app/cli.ts'],
+	outfile: 'dist/cli.js',
 });
 
 // Build editor (Ink/React TUI)
 await esbuild.build({
-    ...sharedConfig,
-    entryPoints: ['src/app/editor-cli.tsx'],
-    outfile: 'dist/editor-cli.js',
+	...sharedConfig,
+	entryPoints: ['src/app/editor-cli.tsx'],
+	outfile: 'dist/editor-cli.js',
 });
 
 // Build proxy server (Worker)
 await esbuild.build({
-    ...sharedConfig,
-    entryPoints: ['src/proxy/server.ts'],
-    outfile: 'dist/server.js',
+	...sharedConfig,
+	entryPoints: ['src/proxy/server.ts'],
+	outfile: 'dist/server.js',
 });
 
 // Build daemon (sudo hosts manager)

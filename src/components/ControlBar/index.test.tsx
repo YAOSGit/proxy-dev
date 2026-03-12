@@ -1,16 +1,21 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
-import { ControlBar } from './index.js';
 import type { Command } from '../../types/Command/index.js';
+import { ControlBar } from './index.js';
 
-const makeCmd = (id: string, key: string, text: string, enabled = true): Command => ({
+const makeCmd = (
+	id: string,
+	key: string,
+	text: string,
+	enabled = true,
+): Command => ({
 	id,
 	keys: [key],
 	displayKey: key,
 	displayText: text,
 	footer: true,
 	isEnabled: () => enabled,
-	execute: () => { },
+	execute: () => {},
 });
 
 describe('ControlBar', () => {

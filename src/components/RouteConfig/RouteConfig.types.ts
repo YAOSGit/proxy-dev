@@ -1,4 +1,8 @@
-import type { ConfigMode, GlobalConfig, TaggedRouteGroup } from '../../types/Config/index.js';
+import type {
+	ConfigMode,
+	GlobalConfig,
+	TaggedRouteGroup,
+} from '../../types/Config/index.js';
 import type { Route } from '../../types/Route/index.js';
 
 interface RouteConfigProps {

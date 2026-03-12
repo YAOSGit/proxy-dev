@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { startDaemonServer } from './server.js';
-import type { DaemonServerHandle } from './server.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { DaemonClient } from './client.js';
+import type { DaemonServerHandle } from './server.js';
+import { startDaemonServer } from './server.js';
 
 describe('DaemonClient', () => {
 	let tmpDir: string;
@@ -17,7 +17,11 @@ describe('DaemonClient', () => {
 		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'daemon-client-test-'));
 		socketPath = path.join(tmpDir, 'proxy-dev.sock');
 		hostsPath = path.join(tmpDir, 'hosts');
-		fs.writeFileSync(hostsPath, '# Test hosts file\n127.0.0.1 localhost\n', 'utf-8');
+		fs.writeFileSync(
+			hostsPath,
+			'# Test hosts file\n127.0.0.1 localhost\n',
+			'utf-8',
+		);
 
 		handle = startDaemonServer({ socketPath, hostsPath });
 		client = new DaemonClient(socketPath);

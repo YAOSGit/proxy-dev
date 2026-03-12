@@ -11,12 +11,37 @@ const formatUptime = (ms: number): string => {
 };
 
 export function SystemHeader(props: SystemHeaderProps) {
-	const { uptimeMs, hostCount, caTrusted, port, proxyStatus, lastError, configMode, version, configWarnings } = props;
-	const statusColor = proxyStatus === 'running' ? 'green' : proxyStatus === 'error' ? 'red' : 'yellow';
-	const modeColor = configMode === 'local' ? 'yellow' : configMode === 'global' ? 'cyan' : 'white';
+	const {
+		uptimeMs,
+		hostCount,
+		caTrusted,
+		port,
+		proxyStatus,
+		lastError,
+		configMode,
+		version,
+		configWarnings,
+	} = props;
+	const statusColor =
+		proxyStatus === 'running'
+			? 'green'
+			: proxyStatus === 'error'
+				? 'red'
+				: 'yellow';
+	const modeColor =
+		configMode === 'local'
+			? 'yellow'
+			: configMode === 'global'
+				? 'cyan'
+				: 'white';
 
 	return (
-		<Box flexDirection="column" borderStyle="round" borderColor="gray" paddingX={1}>
+		<Box
+			flexDirection="column"
+			borderStyle="round"
+			borderColor="gray"
+			paddingX={1}
+		>
 			<Box flexDirection="row" gap={2}>
 				<Text bold color="cyan">
 					proxy-dev <Text dimColor>v{version}</Text>
@@ -35,7 +60,8 @@ export function SystemHeader(props: SystemHeaderProps) {
 				</Text>
 				<Text color="gray">|</Text>
 				<Text>
-					<Text color={hostCount > 0 ? 'green' : 'gray'}>●</Text> {hostCount} hosts
+					<Text color={hostCount > 0 ? 'green' : 'gray'}>●</Text> {hostCount}{' '}
+					hosts
 				</Text>
 				<Text color="gray">|</Text>
 				<Text color={caTrusted ? 'green' : 'red'}>

@@ -2,32 +2,36 @@ import type { IncomingMessage } from 'node:http';
 import type { RouteWithMock } from './interceptor.js';
 
 type TargetDownParams = {
-    error: Error;
-    route: RouteWithMock;
-    req: IncomingMessage;
+	error: Error;
+	route: RouteWithMock;
+	req: IncomingMessage;
 };
 
 type NoRouteParams = {
-    req: IncomingMessage;
-    availableRoutes: RouteWithMock[];
+	req: IncomingMessage;
+	availableRoutes: RouteWithMock[];
 };
 
 const escapeHtml = (str: string): string =>
-    str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	str
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
 
 const buildRequestEcho = (req: IncomingMessage): string => {
-    const host = req.headers.host ?? 'unknown';
-    const method = req.method ?? 'GET';
-    const url = req.url ?? '/';
+	const host = req.headers.host ?? 'unknown';
+	const method = req.method ?? 'GET';
+	const url = req.url ?? '/';
 
-    const headersRows = Object.entries(req.headers)
-        .map(([key, value]) => {
-            const val = Array.isArray(value) ? value.join(', ') : (value ?? '');
-            return `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(val)}</td></tr>`;
-        })
-        .join('');
+	const headersRows = Object.entries(req.headers)
+		.map(([key, value]) => {
+			const val = Array.isArray(value) ? value.join(', ') : (value ?? '');
+			return `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(val)}</td></tr>`;
+		})
+		.join('');
 
-    return `<div class="card">
+	return `<div class="card">
     <div class="card-title">Request Echo</div>
     <div class="card-body">
       <div class="request-line">
@@ -139,9 +143,9 @@ ${body}
 </html>`;
 
 const buildErrorPage = ({ error, route, req }: TargetDownParams): string => {
-    const isConnectionRefused = error.message.includes('ECONNREFUSED');
+	const isConnectionRefused = error.message.includes('ECONNREFUSED');
 
-    const body = `
+	const body = `
   <div class="header">
     <span class="logo">proxy-dev</span>
     <span class="badge">proxy ok</span>
@@ -150,10 +154,11 @@ const buildErrorPage = ({ error, route, req }: TargetDownParams): string => {
 
   <h1>${isConnectionRefused ? 'Target Not Responding' : 'Upstream Error'}</h1>
   <p class="subtitle">
-    ${isConnectionRefused
-        ? `The proxy forwarded this request to <code>localhost:${route.target}</code> but the connection was refused. The target server is likely not running.`
-        : `The proxy encountered an error while forwarding to <code>localhost:${route.target}</code>.`
-    }
+    ${
+			isConnectionRefused
+				? `The proxy forwarded this request to <code>localhost:${route.target}</code> but the connection was refused. The target server is likely not running.`
+				: `The proxy encountered an error while forwarding to <code>localhost:${route.target}</code>.`
+		}
   </p>
 
   <div class="card">
@@ -165,11 +170,19 @@ const buildErrorPage = ({ error, route, req }: TargetDownParams): string => {
         <dt>Path</dt>
         <dd>${route.path ? escapeHtml(route.path) : '<span style="color:#484f58">/ (catch-all)</span>'}</dd>
         <dt>Target</dt>
-        <dd>localhost:<span class="port">${route.target}</span></dd>${route.groupName ? `
+        <dd>localhost:<span class="port">${route.target}</span></dd>${
+					route.groupName
+						? `
         <dt>Group</dt>
-        <dd><span class="group">${escapeHtml(route.groupName)}</span></dd>` : ''}${route.latencyMs ? `
+        <dd><span class="group">${escapeHtml(route.groupName)}</span></dd>`
+						: ''
+				}${
+					route.latencyMs
+						? `
         <dt>Latency</dt>
-        <dd>${route.latencyMs}ms</dd>` : ''}
+        <dd>${route.latencyMs}ms</dd>`
+						: ''
+				}
       </dl>
     </div>
   </div>
@@ -183,23 +196,26 @@ const buildErrorPage = ({ error, route, req }: TargetDownParams): string => {
     The proxy itself is working correctly and will forward traffic once the target is available.
   </div>`;
 
-    return wrapPage('Target Not Responding', body);
+	return wrapPage('Target Not Responding', body);
 };
 
 const buildNoRoutePage = ({ req, availableRoutes }: NoRouteParams): string => {
-    const host = req.headers.host ?? 'unknown';
+	const host = req.headers.host ?? 'unknown';
 
-    const routeListItems = availableRoutes.length > 0
-        ? availableRoutes.map((r) => {
-            const pathPart = r.path ? escapeHtml(r.path) : '';
-            const groupTag = r.groupName
-                ? `<span class="group-tag">${escapeHtml(r.groupName)}</span>`
-                : '';
-            return `<li><span class="domain">${escapeHtml(r.domain)}${pathPart}</span><span class="arrow">-&gt;</span><span class="target">localhost:${r.target}</span>${groupTag}</li>`;
-        }).join('')
-        : '<li class="empty">No routes configured</li>';
+	const routeListItems =
+		availableRoutes.length > 0
+			? availableRoutes
+					.map((r) => {
+						const pathPart = r.path ? escapeHtml(r.path) : '';
+						const groupTag = r.groupName
+							? `<span class="group-tag">${escapeHtml(r.groupName)}</span>`
+							: '';
+						return `<li><span class="domain">${escapeHtml(r.domain)}${pathPart}</span><span class="arrow">-&gt;</span><span class="target">localhost:${r.target}</span>${groupTag}</li>`;
+					})
+					.join('')
+			: '<li class="empty">No routes configured</li>';
 
-    const body = `
+	const body = `
   <div class="header">
     <span class="logo">proxy-dev</span>
     <span class="badge">proxy ok</span>
@@ -225,7 +241,7 @@ const buildNoRoutePage = ({ req, availableRoutes }: NoRouteParams): string => {
     configuration, or check that the correct groups are active.
   </div>`;
 
-    return wrapPage('No Route Found', body);
+	return wrapPage('No Route Found', body);
 };
 
 export { buildErrorPage, buildNoRoutePage };

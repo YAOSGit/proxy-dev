@@ -20,9 +20,11 @@ const useHosts = (): UseHostsReturn => {
 		const socketPath = getDaemonSocketPath();
 		const c = new DaemonClient(socketPath);
 		setStatus('connecting');
-		c.ping().then((ok) => {
-			setStatus(ok ? 'running' : 'error');
-		}).catch(() => setStatus('error'));
+		c.ping()
+			.then((ok) => {
+				setStatus(ok ? 'running' : 'error');
+			})
+			.catch(() => setStatus('error'));
 		return c;
 	});
 

@@ -1,14 +1,14 @@
 [
-    {
-        "path": "dist/cli.js"
-    },
-    {
-        "path": "dist/editor-cli.js"
-    },
-    {
-        "path": "dist/server.js"
-    },
-    {
-        "path": "dist/daemon.js"
-    }
+	{
+		"path": "dist/cli.js"
+	},
+	{
+		"path": "dist/editor-cli.js"
+	},
+	{
+		"path": "dist/server.js"
+	},
+	{
+		"path": "dist/daemon.js"
+	}
 ]
