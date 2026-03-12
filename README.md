@@ -1,4 +1,12 @@
-<h1 align="center">Yet another Open Source proxy-dev</h1>
+<p align="center">
+  <a href="https://github.com/YAOSGit/proxy-dev">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev-light.svg">
+      <img src="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev.svg" width="100%" alt="proxy-dev" />
+    </picture>
+  </a>
+</p>
 
 <p align="center">
   <strong>A local-first reverse proxy and interceptor CLI with a TUI dashboard</strong>
