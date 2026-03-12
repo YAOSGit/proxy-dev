@@ -1,0 +1,14 @@
+{
+	"activeGroups": ["api", "dashboard"],
+	"mocks": {
+		"api.local/users": {
+			"variants": {
+				"success": { "file": "./mocks/api.local/users/success.json", "status": 200 },
+				"empty": { "file": "./mocks/api.local/users/empty.json", "status": 200 },
+				"error": { "file": "./mocks/api.local/users/error-500.json", "status": 500 }
+			},
+			"active": "success"
+		}
+	},
+	"latency": { "globalMs": 200 }
+}

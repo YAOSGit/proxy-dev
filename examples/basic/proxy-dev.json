@@ -1,0 +1,12 @@
+{
+	"groups": {
+		"default": {
+			"description": "Local API server",
+			"routes": [
+				{ "domain": "api.local", "target": 3001 }
+			]
+		}
+	},
+	"activeGroups": ["default"],
+	"mocks": {}
+}

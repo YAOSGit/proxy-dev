@@ -1,0 +1,27 @@
+{
+	"version": 1,
+	"port": 443,
+	"groups": {
+		"auth": {
+			"description": "Authentication service",
+			"routes": [
+				{ "domain": "auth.local", "target": 3001 }
+			]
+		},
+		"api": {
+			"description": "Core API service",
+			"routes": [
+				{ "domain": "api.local", "path": "/users", "target": 3002 },
+				{ "domain": "api.local", "path": "/products", "target": 3002 },
+				{ "domain": "api.local", "target": 3002 }
+			]
+		},
+		"web": {
+			"description": "Web frontend dev server",
+			"routes": [
+				{ "domain": "app.local", "target": 3003, "httpsUpgrade": true }
+			]
+		}
+	},
+	"latency": { "globalMs": 0 }
+}
