@@ -16,11 +16,11 @@ import {
 	getPidPath,
 } from '../utils/platform/index.js';
 
-interface SetupResult {
+type SetupResult = {
 	resolved: ResolvedConfig;
 	certs: CertPathsForWorker;
 	cleanup: () => void;
-}
+};
 
 const setup = async (opts?: {
 	config?: string;
@@ -82,12 +82,16 @@ const setup = async (opts?: {
 		console.log('Hosts daemon already running.');
 	}
 
-	// Register cleanup handlers
+	// Register cleanup handlers — only remove this instance's domains from
+	// /etc/hosts, not all proxy-dev entries (other instances may be running).
 	const appPidPath = getPidPath();
+	const instanceDomains = [...new Set(resolved.routes.map((r) => r.domain))];
 	const asyncCleanup = async () => {
 		try {
 			const client = new DaemonClient(socketPath);
-			await client.cleanup();
+			for (const domain of instanceDomains) {
+				await client.removeHost(domain).catch(() => {});
+			}
 		} catch {}
 		try {
 			fs.unlinkSync(appPidPath);

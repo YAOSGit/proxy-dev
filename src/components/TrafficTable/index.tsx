@@ -5,6 +5,8 @@ import {
 	formatRouteState,
 	formatStatus,
 } from '../../utils/format/index.js';
+import { theme } from '../../theme.js';
+import { DOMAIN_COLOR, EMPTY_STATE_COLOR, LATENCY_COLOR, PATH_COLOR } from './TrafficTable.consts.js';
 import type { TrafficTableProps } from './TrafficTable.types.js';
 
 export function TrafficTable({
@@ -24,7 +26,7 @@ export function TrafficTable({
 				flexDirection="column"
 				gap={1}
 			>
-				<Text color="gray">Waiting for requests...</Text>
+				<Text color={EMPTY_STATE_COLOR}>Waiting for requests...</Text>
 				{hint && <Text dimColor>{hint}</Text>}
 			</Box>
 		);
@@ -48,16 +50,16 @@ export function TrafficTable({
 				const isSelected = globalIdx === selectedIndex;
 				return (
 					<Box key={entry.id} flexDirection="row" gap={1} paddingX={1}>
-						<Text color={isSelected ? 'cyan' : undefined} bold={isSelected}>
+						<Text color={isSelected ? theme.brand : undefined} bold={isSelected}>
 							{isSelected ? '▸' : ' '}
 						</Text>
 						<Text bold={isSelected}>{formatMethod(entry.method)}</Text>
 						<Text bold={isSelected}>{formatStatus(entry.status)}</Text>
-						<Text color="cyan">{entry.domain}</Text>
-						<Text color="white" bold={isSelected}>
+						<Text color={DOMAIN_COLOR}>{entry.domain}</Text>
+						<Text color={PATH_COLOR} bold={isSelected}>
 							{entry.path}
 						</Text>
-						<Text color="gray">{formatLatency(entry.latencyMs)}</Text>
+						<Text color={LATENCY_COLOR}>{formatLatency(entry.latencyMs)}</Text>
 						<Text>{formatRouteState(entry.routeState)}</Text>
 					</Box>
 				);

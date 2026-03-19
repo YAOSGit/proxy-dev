@@ -1,4 +1,6 @@
 import { Box, Text } from 'ink';
+import { FocusablePane } from '@yaos-git/toolkit/tui/components';
+import { theme } from '../../theme.js';
 import { truncateBody } from '../../utils/format/index.js';
 import type { DetailInspectorProps } from './DetailInspector.types.js';
 
@@ -45,32 +47,26 @@ export function DetailInspector({
 		<Box flexDirection="column" flexGrow={1}>
 			<Box flexDirection="row" gap={1} paddingX={1}>
 				<Text
-					color={activePane === 'request' ? 'cyan' : 'gray'}
+					color={activePane === 'request' ? theme.focus : theme.muted}
 					bold={activePane === 'request'}
 				>
-					{activePane === 'request' ? '●' : '○'} Request
+					{activePane === 'request' ? '\u25CF' : '\u25CB'} Request
 				</Text>
-				<Text color="gray">|</Text>
+				<Text color={theme.muted}>|</Text>
 				<Text
-					color={activePane === 'response' ? 'cyan' : 'gray'}
+					color={activePane === 'response' ? theme.focus : theme.muted}
 					bold={activePane === 'response'}
 				>
-					{activePane === 'response' ? '●' : '○'} Response
+					{activePane === 'response' ? '\u25CF' : '\u25CB'} Response
 				</Text>
 				<Box flexGrow={1} />
 			</Box>
-			<Box
-				borderStyle="single"
-				borderColor={activePane === 'request' ? 'cyan' : 'gray'}
-				flexGrow={1}
-				paddingX={1}
-				flexDirection="column"
-			>
+			<FocusablePane focused={true} theme={theme}>
 				{visibleLines.map((line, i) => {
 					const key = `line-${scrollOffset + i}`;
 					return <Text key={key}>{line}</Text>;
 				})}
-			</Box>
+			</FocusablePane>
 		</Box>
 	);
 }

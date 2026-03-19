@@ -1,13 +1,3 @@
-import type { Color } from './index.js';
-
-const METHOD_COLORS: Record<string, Color> = {
-	GET: 'green',
-	POST: 'yellow',
-	PUT: 'blue',
-	PATCH: 'cyan',
-	DELETE: 'red',
-	HEAD: 'gray',
-	OPTIONS: 'magenta',
-};
+import { METHOD_COLORS } from '@yaos-git/toolkit/tui/http';
 
 export { METHOD_COLORS };

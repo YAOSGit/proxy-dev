@@ -1,4 +1,17 @@
 import { Box, Text } from 'ink';
+import {
+	CA_TRUSTED_COLOR,
+	CA_UNTRUSTED_COLOR,
+	CONFIG_MODE_COLORS,
+	ERROR_TEXT_COLOR,
+	HOST_ACTIVE_COLOR,
+	HOST_INACTIVE_COLOR,
+	PORT_COLOR,
+	PROXY_STATUS_COLORS,
+	SEPARATOR_COLOR,
+	UPTIME_COLOR,
+	WARNING_TEXT_COLOR,
+} from './SystemHeader.consts.js';
 import type { SystemHeaderProps } from './SystemHeader.types.js';
 
 const formatUptime = (ms: number): string => {
@@ -19,67 +32,53 @@ export function SystemHeader(props: SystemHeaderProps) {
 		proxyStatus,
 		lastError,
 		configMode,
-		version,
 		configWarnings,
 	} = props;
-	const statusColor =
-		proxyStatus === 'running'
-			? 'green'
-			: proxyStatus === 'error'
-				? 'red'
-				: 'yellow';
-	const modeColor =
-		configMode === 'local'
-			? 'yellow'
-			: configMode === 'global'
-				? 'cyan'
-				: 'white';
+	const statusColor = PROXY_STATUS_COLORS[proxyStatus] ?? PROXY_STATUS_COLORS.starting;
+	const modeColor = CONFIG_MODE_COLORS[configMode] ?? CONFIG_MODE_COLORS.merged;
 
 	return (
 		<Box
+			width="100%"
 			flexDirection="column"
 			borderStyle="round"
 			borderColor="gray"
 			paddingX={1}
 		>
 			<Box flexDirection="row" gap={2}>
-				<Text bold color="cyan">
-					proxy-dev <Text dimColor>v{version}</Text>
-				</Text>
-				<Text color="gray">|</Text>
 				<Text>
-					uptime: <Text color="green">{formatUptime(uptimeMs)}</Text>
+					uptime: <Text color={UPTIME_COLOR}>{formatUptime(uptimeMs)}</Text>
 				</Text>
-				<Text color="gray">|</Text>
+				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text>
-					port: <Text color="yellow">{port}</Text>
+					port: <Text color={PORT_COLOR}>{port}</Text>
 				</Text>
-				<Text color="gray">|</Text>
+				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text>
 					status: <Text color={statusColor}>{proxyStatus}</Text>
 				</Text>
-				<Text color="gray">|</Text>
+				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text>
-					<Text color={hostCount > 0 ? 'green' : 'gray'}>●</Text> {hostCount}{' '}
+					<Text color={hostCount > 0 ? HOST_ACTIVE_COLOR : HOST_INACTIVE_COLOR}>●</Text> {hostCount}{' '}
 					hosts
 				</Text>
-				<Text color="gray">|</Text>
-				<Text color={caTrusted ? 'green' : 'red'}>
+				<Text color={SEPARATOR_COLOR}>|</Text>
+				<Text color={caTrusted ? CA_TRUSTED_COLOR : CA_UNTRUSTED_COLOR}>
 					CA: {caTrusted ? 'trusted' : 'not trusted'}
 				</Text>
-				<Text color="gray">|</Text>
+				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text color={modeColor} dimColor={configMode === 'merged'}>
 					{configMode.toUpperCase()}
 				</Text>
 			</Box>
 			{proxyStatus === 'error' && lastError && (
 				<Box>
-					<Text color="red">ERROR: {lastError}</Text>
+					<Text color={ERROR_TEXT_COLOR}>ERROR: {lastError}</Text>
 				</Box>
 			)}
 			{configWarnings && configWarnings.length > 0 && (
 				<Box>
-					<Text color="yellow">CONFIG: {configWarnings[0]}</Text>
+					<Text color={WARNING_TEXT_COLOR}>CONFIG: {configWarnings[0]}</Text>
 				</Box>
 			)}
 		</Box>

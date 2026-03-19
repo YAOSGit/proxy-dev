@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [126.1.0] - 2026-03-19
+
+### Added
+- CLI e2e tests for all command groups: trust, daemon, routes, groups, mock, flags (32 new tests)
+- `SystemHeader` uses `width="100%"` for full-width rendering
+
+### Changed
+- Hardcoded colors extracted to `.consts.ts` (TrafficTable, SummaryBar, RouteConfig, MockPicker, LatencyInput)
+- `ConfirmDialog`, `DetailInspector`, `ErrorBoundary` use `theme` properties
+- Context initialization uses `null` (not `undefined`)
+- `interface` for non-Props types converted to `type`
+- Non-null assertions replaced with optional chaining
+- Internal function declarations converted to const arrows
+- Existing e2e tests annotated as "(integration)" with cross-references to new CLI tests
+- Toolkit bumped to 0.0.26-3-19a
+- Biome updated to 2.4.8
+
+### Fixed
+- `httpsServer!.address()` → `httpsServer?.address() ?? null`
+
 ## [126.0.0] - 2026-03-10
 
 ### Added

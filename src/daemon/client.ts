@@ -93,6 +93,20 @@ class DaemonClient {
 		return response.domains ?? [];
 	}
 
+	async register(domain: string, port: number): Promise<void> {
+		const response = await this.sendCommand({ action: 'register', domain, port });
+		if (!response.ok) {
+			throw new Error(response.error);
+		}
+	}
+
+	async unregister(domain: string): Promise<void> {
+		const response = await this.sendCommand({ action: 'unregister', domain });
+		if (!response.ok) {
+			throw new Error(response.error);
+		}
+	}
+
 	async shutdown(): Promise<void> {
 		try {
 			const response = await this.sendCommand({ action: 'shutdown' });

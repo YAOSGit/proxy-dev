@@ -1,4 +1,10 @@
 import { Box, Text } from 'ink';
+import {
+	HEADING_COLOR,
+	HINT_COLOR,
+	INPUT_COLOR,
+	LABEL_COLOR,
+} from './LatencyInput.consts.js';
 import type { LatencyInputProps } from './LatencyInput.types.js';
 
 export function LatencyInput({
@@ -16,13 +22,13 @@ export function LatencyInput({
 
 	return (
 		<Box flexDirection="column" borderStyle="round" paddingX={2} paddingY={1}>
-			<Text bold color="cyan">
+			<Text bold color={HEADING_COLOR}>
 				{label}
 			</Text>
-			<Text color="gray">Current: {currentMs}ms</Text>
+			<Text color={HINT_COLOR}>Current: {currentMs}ms</Text>
 			<Box marginTop={1} flexDirection="row" gap={1}>
-				<Text color="white">New value (ms):</Text>
-				<Text color="cyan">{inputValue || '_'}</Text>
+				<Text color={LABEL_COLOR}>New value (ms):</Text>
+				<Text color={INPUT_COLOR}>{inputValue || '_'}</Text>
 			</Box>
 		</Box>
 	);

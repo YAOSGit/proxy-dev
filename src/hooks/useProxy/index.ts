@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Worker } from 'node:worker_threads';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { DaemonClient } from '../../daemon/index.js';
 import type { ResolvedConfig } from '../../types/Config/index.js';
 import type {
 	CertPathsForWorker,
@@ -10,6 +11,7 @@ import type {
 } from '../../types/Ipc/index.js';
 import type { LatencyConfig } from '../../types/Latency/index.js';
 import type { MockVariant } from '../../types/Mock/index.js';
+import { getDaemonSocketPath } from '../../utils/platform/index.js';
 
 type ProxyStatus = 'stopped' | 'starting' | 'running' | 'error';
 
@@ -33,15 +35,35 @@ const useProxy = (
 	const [port, setPort] = useState<number | null>(null);
 	const [lastError, setLastError] = useState<string | null>(null);
 	const workerRef = useRef<Worker | null>(null);
+	/** Domains registered with the daemon by this proxy instance. */
+	const domainsRef = useRef<string[]>([]);
+	/** Internal port the proxy worker is listening on (for updateRoutes diff). */
+	const portRef = useRef<number | null>(null);
 
 	const sendCommand = useCallback((cmd: ProxyCommand) => {
 		workerRef.current?.postMessage(cmd);
+	}, []);
+
+	const registerDomains = useCallback((domains: string[], internalPort: number) => {
+		const client = new DaemonClient(getDaemonSocketPath());
+		for (const domain of domains) {
+			client.register(domain, internalPort).catch(() => {});
+		}
+	}, []);
+
+	const unregisterDomains = useCallback((domains: string[]) => {
+		const client = new DaemonClient(getDaemonSocketPath());
+		for (const domain of domains) {
+			client.unregister(domain).catch(() => {});
+		}
 	}, []);
 
 	const startProxy = useCallback(
 		(config: ResolvedConfig, certs: CertPathsForWorker) => {
 			if (workerRef.current) return;
 			setStatus('starting');
+
+			domainsRef.current = [...new Set(config.routes.map((r) => r.domain))];
 
 			// Resolve server.ts path relative to this file
 			const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -54,6 +76,8 @@ const useProxy = (
 				if (event.type === 'ready') {
 					setStatus('running');
 					setPort(event.port);
+					portRef.current = event.port;
+					registerDomains(domainsRef.current, event.port);
 				} else if (event.type === 'request') {
 					onTrafficEntry(event.entry);
 				} else if (event.type === 'error') {
@@ -83,23 +107,37 @@ const useProxy = (
 			};
 			worker.postMessage(startCmd);
 		},
-		[onTrafficEntry],
+		[onTrafficEntry, registerDomains],
 	);
 
 	const stopProxy = useCallback(() => {
-		if (workerRef.current) {
-			sendCommand({ type: 'stop' });
-		}
-	}, [sendCommand]);
+		if (!workerRef.current) return;
+		unregisterDomains(domainsRef.current);
+		domainsRef.current = [];
+		portRef.current = null;
+		sendCommand({ type: 'stop' });
+	}, [sendCommand, unregisterDomains]);
 
 	const updateRoutes = useCallback(
 		(config: ResolvedConfig) => {
+			const newDomains = [...new Set(config.routes.map((r) => r.domain))];
+			const oldDomains = domainsRef.current;
+			const internalPort = portRef.current;
+
+			if (internalPort !== null) {
+				const added = newDomains.filter((d) => !oldDomains.includes(d));
+				const removed = oldDomains.filter((d) => !newDomains.includes(d));
+				if (added.length > 0) registerDomains(added, internalPort);
+				if (removed.length > 0) unregisterDomains(removed);
+			}
+
+			domainsRef.current = newDomains;
 			sendCommand({
 				type: 'update-routes',
 				config: { port: config.port, routes: config.routes },
 			});
 		},
-		[sendCommand],
+		[sendCommand, registerDomains, unregisterDomains],
 	);
 
 	const updateLatency = useCallback(

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
+import { atomicWrite } from '@yaos-git/toolkit/cli';
 import type { LocalConfig } from '../../types/Config/index.js';
 import type { MockVariant } from '../../types/Mock/index.js';
 
@@ -65,9 +65,7 @@ const writeMockFile = (
 		content = body;
 	}
 
-	const tmpPath = path.join(os.tmpdir(), `proxy-dev-mock-${Date.now()}.tmp`);
-	fs.writeFileSync(tmpPath, content, 'utf-8');
-	fs.renameSync(tmpPath, filePath);
+	atomicWrite(filePath, content);
 };
 
 type MockFileContent = {
@@ -117,9 +115,7 @@ const addMockToLocalConfig = (
 	const mockRoute = config.mocks[routeKey];
 	if (mockRoute) mockRoute.variants[variantName] = variant;
 
-	const tmpPath = path.join(os.tmpdir(), `proxy-dev-local-${Date.now()}.tmp`);
-	fs.writeFileSync(tmpPath, JSON.stringify(config, null, '\t'), 'utf-8');
-	fs.renameSync(tmpPath, configPath);
+	atomicWrite(configPath, JSON.stringify(config, null, '\t'));
 };
 
 export {

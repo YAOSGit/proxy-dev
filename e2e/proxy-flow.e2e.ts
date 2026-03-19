@@ -1,3 +1,6 @@
+// NOTE: This is an integration test — it exercises internal proxy/config APIs
+// (matchRoute, resolveLatency, mergeConfigs, etc.) rather than invoking the
+// CLI binary. For CLI-level route tests see routes.e2e.ts.
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { matchRoute } from '../src/proxy/interceptor.js';
 import { resolveLatency } from '../src/proxy/latency.js';
@@ -9,7 +12,7 @@ import {
 } from '../src/utils/config/index.js';
 import { createTempDir } from './utils/index.js';
 
-describe('proxy flow E2E', () => {
+describe('proxy flow E2E (integration)', () => {
 	let tmpDir: string;
 	let cleanup: () => void;
 	let origXdg: string | undefined;

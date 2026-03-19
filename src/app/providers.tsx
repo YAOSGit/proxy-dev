@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import type React from 'react';
+
 import { HostsProvider } from '../providers/HostsProvider/index.js';
 import { ProxyProvider } from '../providers/ProxyProvider/index.js';
 import { RoutesProvider } from '../providers/RoutesProvider/index.js';
@@ -6,10 +7,10 @@ import { TrafficProvider } from '../providers/TrafficProvider/index.js';
 import { UIStateProvider } from '../providers/UIStateProvider/index.js';
 
 interface AppProvidersProps {
-	children: ReactNode;
+	children: React.ReactNode;
 }
 
-export function AppProviders({ children }: AppProvidersProps) {
+export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
 	return (
 		<RoutesProvider>
 			<HostsProvider>
@@ -21,4 +22,4 @@ export function AppProviders({ children }: AppProvidersProps) {
 			</HostsProvider>
 		</RoutesProvider>
 	);
-}
+};

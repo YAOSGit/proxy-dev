@@ -1,6 +1,7 @@
 import { Box, Text } from 'ink';
 import type React from 'react';
 import { Component } from 'react';
+import { theme } from '../../theme.js';
 import type {
 	ErrorBoundaryProps,
 	ErrorBoundaryState,
@@ -38,15 +39,15 @@ export class ErrorBoundary extends Component<
 					<Box
 						flexDirection="column"
 						borderStyle="round"
-						borderColor="red"
+						borderColor={theme.error}
 						paddingX={1}
 						paddingY={1}
 					>
-						<Text bold color="red">
+						<Text bold color={theme.error}>
 							Something went wrong
 						</Text>
 						<Box marginTop={1}>
-							<Text color="yellow">{this.state.error?.message}</Text>
+							<Text color={theme.warning}>{this.state.error?.message}</Text>
 						</Box>
 						{this.state.componentStack && (
 							<Box marginTop={1} flexDirection="column">

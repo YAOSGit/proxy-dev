@@ -1,7 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import type { OverlayState, PendingConfirmation } from '@yaos-git/toolkit/types';
 
 type ViewLevel = 'traffic' | 'detail';
 type DetailPane = 'request' | 'response';
+
+type ProxyOverlay = 'help' | 'mock' | 'confirmation' | 'routeConfig' | 'latency';
 
 type UIState = {
 	viewLevel: ViewLevel;
@@ -16,23 +19,25 @@ type UIState = {
 	confirmCallback: (() => void) | null;
 };
 
-type UseUIStateReturn = UIState & {
-	openDetail: () => void;
-	closeDetail: () => void;
-	switchDetailPane: () => void;
-	openMockPicker: () => void;
-	closeMockPicker: () => void;
-	openLatencyInput: () => void;
-	closeLatencyInput: () => void;
-	openHelp: () => void;
-	closeHelp: () => void;
-	openRouteConfig: () => void;
-	closeRouteConfig: () => void;
-	openConfirm: (message: string, callback: () => void) => void;
-	closeConfirm: () => void;
-	scroll: (delta: number) => void;
-	resetScroll: () => void;
-};
+type UseUIStateReturn = UIState &
+	OverlayState & {
+		cycleFocus: () => void;
+		openDetail: () => void;
+		closeDetail: () => void;
+		switchDetailPane: () => void;
+		openMockPicker: () => void;
+		closeMockPicker: () => void;
+		openLatencyInput: () => void;
+		closeLatencyInput: () => void;
+		openHelp: () => void;
+		closeHelp: () => void;
+		openRouteConfig: () => void;
+		closeRouteConfig: () => void;
+		openConfirm: (message: string, callback: () => void) => void;
+		closeConfirm: () => void;
+		scroll: (delta: number) => void;
+		resetScroll: () => void;
+	};
 
 const INITIAL_STATE: UIState = {
 	viewLevel: 'traffic',
@@ -139,6 +144,88 @@ const useUIState = (): UseUIStateReturn => {
 		[],
 	);
 
+	// --- OverlayState adapter ---
+
+	const activeOverlay: string | 'none' = state.showHelp
+		? 'help'
+		: state.showMockPicker
+			? 'mock'
+			: state.showConfirm
+				? 'confirmation'
+				: state.showRouteConfig
+					? 'routeConfig'
+					: state.showLatencyInput
+						? 'latency'
+						: 'none';
+
+	const setActiveOverlay = useCallback(
+		(overlay: string | 'none') => {
+			setState((s) => {
+				// Close all overlays first
+				const base: UIState = {
+					...s,
+					showHelp: false,
+					showMockPicker: false,
+					showConfirm: false,
+					showRouteConfig: false,
+					showLatencyInput: false,
+				};
+				// If closing confirm, also clear its message/callback
+				if (s.showConfirm && overlay !== 'confirmation') {
+					base.confirmMessage = '';
+					base.confirmCallback = null;
+				}
+				// Open the requested overlay
+				switch (overlay) {
+					case 'help':
+						return { ...base, showHelp: true };
+					case 'mock':
+						return { ...base, showMockPicker: true };
+					case 'confirmation':
+						return { ...base, showConfirm: true };
+					case 'routeConfig':
+						return { ...base, showRouteConfig: true };
+					case 'latency':
+						return { ...base, showLatencyInput: true };
+					default:
+						return base;
+				}
+			});
+		},
+		[],
+	);
+
+	const confirmation: PendingConfirmation | null = useMemo(
+		() =>
+			state.showConfirm && state.confirmCallback
+				? { message: state.confirmMessage, onConfirm: state.confirmCallback }
+				: null,
+		[state.showConfirm, state.confirmMessage, state.confirmCallback],
+	);
+
+	const requestConfirmation = useCallback(
+		(message: string, onConfirm: () => void) => {
+			setState((s) => ({
+				...s,
+				showConfirm: true,
+				confirmMessage: message,
+				confirmCallback: onConfirm,
+			}));
+		},
+		[],
+	);
+
+	const clearConfirmation = useCallback(() => {
+		setState((s) => ({
+			...s,
+			showConfirm: false,
+			confirmMessage: '',
+			confirmCallback: null,
+		}));
+	}, []);
+
+	const cycleFocus = useCallback(() => {}, []);
+
 	return {
 		...state,
 		openDetail,
@@ -156,8 +243,15 @@ const useUIState = (): UseUIStateReturn => {
 		closeConfirm,
 		scroll,
 		resetScroll,
+		// OverlayState adapter
+		activeOverlay,
+		setActiveOverlay,
+		confirmation,
+		requestConfirmation,
+		clearConfirmation,
+		cycleFocus,
 	};
 };
 
 export { useUIState };
-export type { UseUIStateReturn, UIState, ViewLevel, DetailPane };
+export type { UseUIStateReturn, UIState, ViewLevel, DetailPane, ProxyOverlay };

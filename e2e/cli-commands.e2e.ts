@@ -1,9 +1,12 @@
+// NOTE: This is an integration test — it exercises internal APIs directly
+// (bootstrapGlobalConfig, loadGlobalConfig, etc.) rather than invoking the
+// CLI binary. For CLI-level binary tests see flags.e2e.ts, routes.e2e.ts, etc.
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createTempDir } from './utils/index.js';
 
-describe('CLI commands E2E', () => {
+describe('CLI commands E2E (integration)', () => {
 	let tmpDir: string;
 	let cleanup: () => void;
 	let origXdg: string | undefined;

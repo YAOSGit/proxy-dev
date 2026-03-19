@@ -1,27 +1,31 @@
-import chalk from 'chalk';
+import chalk, { type ChalkInstance } from 'chalk';
+import {
+	METHOD_COLORS as TOOLKIT_METHOD_COLORS,
+	statusColor,
+} from '@yaos-git/toolkit/tui/http';
 
-const METHOD_COLORS: Record<string, (s: string) => string> = {
-	GET: chalk.green,
-	POST: chalk.yellow,
-	PUT: chalk.blue,
-	PATCH: chalk.cyan,
-	DELETE: chalk.red,
-	HEAD: chalk.gray,
-	OPTIONS: chalk.magenta,
+const COLOR_FNS: Record<string, ChalkInstance> = {
+	green: chalk.green,
+	yellow: chalk.yellow,
+	blue: chalk.blue,
+	cyan: chalk.cyan,
+	red: chalk.red,
+	gray: chalk.gray,
+	magenta: chalk.magenta,
+	white: chalk.white,
 };
 
 const formatMethod = (method: string): string => {
-	const colorFn = METHOD_COLORS[method.toUpperCase()];
+	const colorName = TOOLKIT_METHOD_COLORS[method.toUpperCase()] ?? 'white';
+	const colorFn = COLOR_FNS[colorName] ?? ((s: string) => s);
 	const padded = method.toUpperCase().padEnd(7);
-	return colorFn ? colorFn(padded) : padded;
+	return colorFn(padded);
 };
 
 const formatStatus = (status: number): string => {
-	if (status >= 200 && status < 300) return chalk.green(String(status));
-	if (status >= 300 && status < 400) return chalk.yellow(String(status));
-	if (status >= 400 && status < 500) return chalk.red(String(status));
-	if (status >= 500) return chalk.magenta(String(status));
-	return String(status);
+	const colorName = statusColor(status);
+	const colorFn = COLOR_FNS[colorName];
+	return colorFn ? colorFn(String(status)) : String(status);
 };
 
 const formatLatency = (ms: number): string => {

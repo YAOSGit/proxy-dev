@@ -8,7 +8,6 @@ interface SystemHeaderProps {
 	proxyStatus: 'stopped' | 'starting' | 'running' | 'error';
 	lastError: string | null;
 	configMode: ConfigMode;
-	version: string;
 	configWarnings?: string[];
 }
 

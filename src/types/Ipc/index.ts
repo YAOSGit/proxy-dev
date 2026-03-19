@@ -36,7 +36,11 @@ type DaemonCommand =
 	| { action: 'cleanup' }
 	| { action: 'list' }
 	| { action: 'ping' }
-	| { action: 'shutdown' };
+	| { action: 'shutdown' }
+	/** Register a domain → backend port mapping in the daemon's SNI router. */
+	| { action: 'register'; domain: string; port: number }
+	/** Remove a domain from the daemon's SNI router. */
+	| { action: 'unregister'; domain: string };
 
 type DaemonResponse =
 	| { ok: true; domains?: string[] }

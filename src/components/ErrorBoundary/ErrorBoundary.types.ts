@@ -5,10 +5,10 @@ interface ErrorBoundaryProps {
 	fallback?: ReactNode;
 }
 
-interface ErrorBoundaryState {
+type ErrorBoundaryState = {
 	hasError: boolean;
 	error: Error | null;
 	componentStack: string | null;
-}
+};
 
 export type { ErrorBoundaryProps, ErrorBoundaryState };

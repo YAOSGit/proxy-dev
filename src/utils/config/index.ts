@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
+import { atomicWrite } from '@yaos-git/toolkit/cli';
 import type {
 	ConfigMode,
 	ConfigSource,
@@ -72,22 +72,10 @@ const loadLocalConfig = (cwd?: string): LocalConfig | null => {
 	}
 };
 
-const atomicWrite = (filePath: string, content: string): void => {
+const atomicWriteWithDir = (filePath: string, content: string): void => {
 	const dir = path.dirname(filePath);
 	fs.mkdirSync(dir, { recursive: true });
-	const tmpPath = path.join(
-		os.tmpdir(),
-		`proxy-dev-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-	);
-	fs.writeFileSync(tmpPath, content, 'utf-8');
-	try {
-		fs.renameSync(tmpPath, filePath);
-	} catch (err) {
-		try {
-			fs.unlinkSync(tmpPath);
-		} catch {}
-		throw err;
-	}
+	atomicWrite(filePath, content);
 };
 
 const saveGlobalConfig = (config: GlobalConfig): void => {
@@ -99,7 +87,7 @@ const saveGlobalConfig = (config: GlobalConfig): void => {
 		return;
 	}
 	const configPath = getGlobalConfigPath();
-	atomicWrite(configPath, JSON.stringify(result.data, null, '\t'));
+	atomicWriteWithDir(configPath, JSON.stringify(result.data, null, '\t'));
 };
 
 const saveLocalConfig = (config: LocalConfig, cwd?: string): void => {
@@ -112,7 +100,7 @@ const saveLocalConfig = (config: LocalConfig, cwd?: string): void => {
 	}
 	const dir = cwd ?? process.cwd();
 	const configPath = path.join(dir, LOCAL_CONFIG_FILENAME);
-	atomicWrite(configPath, JSON.stringify(result.data, null, '\t'));
+	atomicWriteWithDir(configPath, JSON.stringify(result.data, null, '\t'));
 };
 
 const bootstrapGlobalConfig = (): void => {
@@ -194,7 +182,7 @@ const bootstrapLocalConfig = (cwd?: string): LocalConfig => {
 	const dir = cwd ?? process.cwd();
 	const configPath = path.join(dir, LOCAL_CONFIG_FILENAME);
 	const config: LocalConfig = { mocks: {} };
-	atomicWrite(configPath, JSON.stringify(config, null, '\t'));
+	atomicWriteWithDir(configPath, JSON.stringify(config, null, '\t'));
 	return config;
 };
 

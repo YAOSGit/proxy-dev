@@ -1,3 +1,6 @@
+// NOTE: This is an integration test — it exercises internal snapshot APIs
+// (writeMockFile, readMockFile, addMockToLocalConfig, etc.) rather than
+// invoking the CLI binary. For CLI-level mock tests see mock.e2e.ts.
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -10,7 +13,7 @@ import {
 } from '../src/utils/snapshot/index.js';
 import { createTempDir } from './utils/index.js';
 
-describe('mock system E2E', () => {
+describe('mock system E2E (integration)', () => {
 	let tmpDir: string;
 	let cleanup: () => void;
 

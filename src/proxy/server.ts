@@ -48,7 +48,6 @@ const getMockVariant = (
 };
 
 let httpsServer: https.Server | null = null;
-let httpServer: http.Server | null = null;
 let proxyAgent: http.Agent | null = null;
 
 const startServer = (certs: CertPathsForWorker): void => {
@@ -314,40 +313,22 @@ const startServer = (certs: CertPathsForWorker): void => {
 	httpsServer = https.createServer(sslOptions, (req, res) =>
 		requestHandler(req, res, true),
 	);
-	httpServer = http.createServer((req, res) => requestHandler(req, res, false));
 
-	httpsServer.listen(state.port, () => {
-		emitEvent({ type: 'ready', port: state.port });
-	});
-
-	httpServer.listen(80, () => {
-		// console.log('HTTP server listening on port 80');
+	// Listen on an OS-assigned port (0) so multiple instances can coexist.
+	// The daemon's SNI TCP router on port 443 forwards traffic here.
+	httpsServer.listen(0, '127.0.0.1', () => {
+		const addr = httpsServer?.address() ?? null;
+		const assignedPort = typeof addr === 'object' && addr !== null ? addr.port : 0;
+		emitEvent({ type: 'ready', port: assignedPort });
 	});
 
 	httpsServer.on('error', (err: NodeJS.ErrnoException) => {
-		if (err.code === 'EADDRINUSE') {
-			emitEvent({
-				type: 'error',
-				message: `Port ${state.port} already in use. Stop the conflicting service or use a different port.`,
-			});
-		} else if (err.code === 'EACCES') {
-			emitEvent({
-				type: 'error',
-				message: `Permission denied for port ${state.port}. Ports below 1024 require root privileges.`,
-			});
-		} else {
-			emitEvent({ type: 'error', message: `HTTPS Error: ${err.message}` });
-		}
+		emitEvent({ type: 'error', message: `HTTPS Error: ${err.message}` });
 	});
 
 	httpsServer.on('tlsClientError', (err) => {
 		// Log handshake errors to help debug cipher issues
 		console.warn(`[TLS] Client error: ${err.message}`);
-	});
-
-	httpServer.on('error', (err) => {
-		console.error('HTTP Port 80 error:', err.message);
-		// We don't fail the whole proxy if port 80 is busy, but we log it
 	});
 };
 
@@ -373,7 +354,6 @@ parentPort?.on('message', (cmd: ProxyCommand) => {
 		}
 		case 'stop': {
 			httpsServer?.close();
-			httpServer?.close();
 			proxyAgent?.destroy();
 			setTimeout(() => process.exit(0), 500);
 			break;

@@ -1,6 +1,20 @@
 import { Box, Text, useInput } from 'ink';
 import { useState } from 'react';
 import type { Route } from '../../types/Route/index.js';
+import {
+	ACTIVE_GROUP_COLOR,
+	ACTIVE_STEP_COLOR,
+	CURSOR_COLOR,
+	DOMAIN_ERROR_COLOR,
+	GLOBAL_SOURCE_COLOR,
+	HEADING_COLOR,
+	HTTPS_COLOR,
+	INACTIVE_GROUP_COLOR,
+	INACTIVE_STEP_COLOR,
+	LATENCY_COLOR,
+	LOCAL_SOURCE_COLOR,
+	POINTER_COLOR,
+} from './RouteConfig.consts.js';
 import type {
 	AddGroupFormProps,
 	AddRouteFormProps,
@@ -15,7 +29,7 @@ type ListItem =
 	| { type: 'add-route'; groupName: string }
 	| { type: 'add-group' };
 
-function AddRouteForm({ groupName, onSave, onCancel }: AddRouteFormProps) {
+const AddRouteForm = ({ groupName, onSave, onCancel }: AddRouteFormProps) => {
 	const [domain, setDomain] = useState('');
 	const [path, setPath] = useState('');
 	const [target, setTarget] = useState('');
@@ -77,56 +91,56 @@ function AddRouteForm({ groupName, onSave, onCancel }: AddRouteFormProps) {
 
 	return (
 		<Box flexDirection="column" paddingX={2} paddingY={1} borderStyle="round">
-			<Text bold color="cyan">
+			<Text bold color={HEADING_COLOR}>
 				Add Route to {groupName}
 			</Text>
 			<Box flexDirection="column">
 				<Box>
-					<Text color={step === 'domain' ? 'white' : 'gray'}>Domain: </Text>
+					<Text color={step === 'domain' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>Domain: </Text>
 					<Text>
 						{domain}
-						{step === 'domain' && <Text color="cyan">|</Text>}
+						{step === 'domain' && <Text color={CURSOR_COLOR}>|</Text>}
 					</Text>
 				</Box>
 				{domainError && step === 'domain' && (
-					<Text color="red"> {domainError}</Text>
+					<Text color={DOMAIN_ERROR_COLOR}> {domainError}</Text>
 				)}
 			</Box>
 			{step !== 'domain' && (
 				<Box>
-					<Text color={step === 'path' ? 'white' : 'gray'}>
+					<Text color={step === 'path' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>
 						Path prefix (optional):{' '}
 					</Text>
 					<Text>
 						{path}
-						{step === 'path' && <Text color="cyan">|</Text>}
+						{step === 'path' && <Text color={CURSOR_COLOR}>|</Text>}
 					</Text>
 				</Box>
 			)}
 			{(step === 'target' || step === 'upgrade') && (
 				<Box>
-					<Text color={step === 'target' ? 'white' : 'gray'}>
+					<Text color={step === 'target' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>
 						Target port:{' '}
 					</Text>
 					<Text>
 						{target}
-						{step === 'target' && <Text color="cyan">|</Text>}
+						{step === 'target' && <Text color={CURSOR_COLOR}>|</Text>}
 					</Text>
 				</Box>
 			)}
 			{step === 'upgrade' && (
 				<Box>
-					<Text color="white">HTTP → HTTPS upgrade? (y/n): </Text>
-					<Text color={httpsUpgrade ? 'green' : 'red'}>
+					<Text color={ACTIVE_STEP_COLOR}>HTTP → HTTPS upgrade? (y/n): </Text>
+					<Text color={httpsUpgrade ? HTTPS_COLOR : DOMAIN_ERROR_COLOR}>
 						{httpsUpgrade ? 'Yes' : 'No'}
 					</Text>
 				</Box>
 			)}
 		</Box>
 	);
-}
+};
 
-function AddGroupForm({ onSave, onCancel, configMode }: AddGroupFormProps) {
+const AddGroupForm = ({ onSave, onCancel, configMode }: AddGroupFormProps) => {
 	const [name, setName] = useState('');
 	const [step, setStep] = useState<'name' | 'source'>('name');
 	const [source, setSource] = useState<'local' | 'global'>('local');
@@ -163,25 +177,25 @@ function AddGroupForm({ onSave, onCancel, configMode }: AddGroupFormProps) {
 
 	return (
 		<Box flexDirection="column" paddingX={2} paddingY={1} borderStyle="round">
-			<Text bold color="cyan">
+			<Text bold color={HEADING_COLOR}>
 				Add Route Group
 			</Text>
 			<Box>
-				<Text color={step === 'name' ? 'white' : 'gray'}>Group Name: </Text>
+				<Text color={step === 'name' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>Group Name: </Text>
 				<Text>
 					{name}
-					{step === 'name' && <Text color="cyan">|</Text>}
+					{step === 'name' && <Text color={CURSOR_COLOR}>|</Text>}
 				</Text>
 			</Box>
 			{step === 'source' && (
 				<Box>
-					<Text color="white">Source [l]ocal / [g]lobal: </Text>
-					<Text color={source === 'local' ? 'yellow' : 'cyan'}>{source}</Text>
+					<Text color={ACTIVE_STEP_COLOR}>Source [l]ocal / [g]lobal: </Text>
+					<Text color={source === 'local' ? LOCAL_SOURCE_COLOR : GLOBAL_SOURCE_COLOR}>{source}</Text>
 				</Box>
 			)}
 		</Box>
 	);
-}
+};
 
 export function RouteConfig({
 	global,
@@ -294,19 +308,19 @@ export function RouteConfig({
 	return (
 		<Box flexDirection="column" borderStyle="round" paddingX={2} paddingY={1}>
 			<Box flexDirection="row" justifyContent="space-between">
-				<Text bold color="cyan">
+				<Text bold color={HEADING_COLOR}>
 					Route Configuration
 				</Text>
-				<Text color="gray">Port 80 enabled + HTTPS Upgrade</Text>
+				<Text color={INACTIVE_STEP_COLOR}>Port 80 enabled + HTTPS Upgrade</Text>
 			</Box>
 			<Box flexDirection="column" marginTop={1}>
 				{items.length === 0 ? (
-					<Text color="gray">No items</Text>
+					<Text color={INACTIVE_GROUP_COLOR}>No items</Text>
 				) : (
 					items.map((item, i) => {
 						const isSelected = i === selectedIndex;
 						const pointer = isSelected ? (
-							<Text color="cyan">{'> '}</Text>
+							<Text color={POINTER_COLOR}>{'> '}</Text>
 						) : (
 							<Text>{'  '}</Text>
 						);
@@ -317,25 +331,25 @@ export function RouteConfig({
 							const tagged = taggedGroups[item.name];
 							const sourcePrefix =
 								configMode === 'merged' && tagged ? (
-									<Text color={tagged.source === 'global' ? 'cyan' : 'yellow'}>
+									<Text color={tagged.source === 'global' ? GLOBAL_SOURCE_COLOR : LOCAL_SOURCE_COLOR}>
 										{tagged.source}:{' '}
 									</Text>
 								) : null;
 							return (
 								<Box key={`group-${item.name}`} marginTop={i > 0 ? 1 : 0}>
 									{pointer}
-									<Text color={isActive ? 'green' : 'gray'}>
+									<Text color={isActive ? ACTIVE_GROUP_COLOR : INACTIVE_GROUP_COLOR}>
 										{isActive ? '● ' : '○ '}
 									</Text>
 									{sourcePrefix}
 									<Text
 										bold
-										color={isSelected ? 'white' : isActive ? 'white' : 'gray'}
+										color={isSelected ? ACTIVE_STEP_COLOR : isActive ? ACTIVE_STEP_COLOR : INACTIVE_GROUP_COLOR}
 									>
 										{item.name}
 									</Text>
 									{item.description && (
-										<Text color="gray"> — {item.description}</Text>
+										<Text color={INACTIVE_GROUP_COLOR}> — {item.description}</Text>
 									)}
 								</Box>
 							);
@@ -349,21 +363,21 @@ export function RouteConfig({
 									{pointer}
 									<Box flexDirection="row" gap={1}>
 										<Text
-											color={isSelected ? 'white' : 'gray'}
+											color={isSelected ? ACTIVE_STEP_COLOR : INACTIVE_GROUP_COLOR}
 											dimColor={!isSelected}
 										>
 											→{' '}
-											<Text color={isSelected ? 'cyan' : undefined}>
+											<Text color={isSelected ? HEADING_COLOR : undefined}>
 												{item.route.domain}
 												{item.route.path ?? ''}
 											</Text>{' '}
 											→ localhost:{item.route.target}
 										</Text>
 										{item.route.httpsUpgrade && (
-											<Text color="green">[HTTPS]</Text>
+											<Text color={HTTPS_COLOR}>[HTTPS]</Text>
 										)}
 										{item.route.latencyMs !== undefined && (
-											<Text color="yellow"> +{item.route.latencyMs}ms</Text>
+											<Text color={LATENCY_COLOR}> +{item.route.latencyMs}ms</Text>
 										)}
 									</Box>
 								</Box>
@@ -373,7 +387,7 @@ export function RouteConfig({
 							return (
 								<Box key={`addroute-${item.groupName}`} paddingLeft={4}>
 									{pointer}
-									<Text color="gray" dimColor={!isSelected}>
+									<Text color={INACTIVE_GROUP_COLOR} dimColor={!isSelected}>
 										+ Add route...
 									</Text>
 								</Box>
@@ -382,7 +396,7 @@ export function RouteConfig({
 						return (
 							<Box key="addgroup" marginTop={1}>
 								{pointer}
-								<Text color="gray" dimColor={!isSelected}>
+								<Text color={INACTIVE_GROUP_COLOR} dimColor={!isSelected}>
 									+ Add new group...
 								</Text>
 							</Box>

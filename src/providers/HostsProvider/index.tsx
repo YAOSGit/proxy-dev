@@ -7,11 +7,11 @@ import { getCertsDir, getLeavesDir } from '../../utils/platform/index.js';
 import { useRoutesContext } from '../RoutesProvider/index.js';
 import type { HostsProviderProps } from './HostsProvider.types.js';
 
-const HostsContext = createContext<UseHostsReturn | undefined>(undefined);
+const HostsContext = createContext<UseHostsReturn | null>(null);
 
 const useHostsContext = (): UseHostsReturn => {
 	const context = useContext(HostsContext);
-	if (context === undefined) {
+	if (context === null) {
 		throw new Error('useHostsContext must be used within a HostsProvider');
 	}
 	return context;
