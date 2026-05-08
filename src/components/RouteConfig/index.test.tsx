@@ -9,9 +9,7 @@ const makeGlobal = (): GlobalConfig => ({
 	groups: {
 		api: {
 			description: 'API routes',
-			routes: [
-				{ domain: 'api.local', target: 3000 },
-			],
+			routes: [{ domain: 'api.local', target: 3000 }],
 		},
 	},
 	latency: { globalMs: 0 },

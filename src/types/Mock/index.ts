@@ -10,4 +10,4 @@ type MockRoute = {
 	active?: string;
 };
 
-export type { MockVariant, MockRoute };
+export type { MockRoute, MockVariant };

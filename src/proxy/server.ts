@@ -225,19 +225,21 @@ const startServer = (certs: CertPathsForWorker): void => {
 
 			const forwardHeaders = { ...req.headers };
 
+			// Collect body chunks immediately, before any latency delay,
+			// so chunks emitted during the delay are not lost.
+			const MAX_LOG_BODY = 4096;
+			const bodyChunks: Buffer[] = [];
+			let loggedBytes = 0;
+
+			req.on('data', (chunk: Buffer) => {
+				if (loggedBytes < MAX_LOG_BODY) {
+					bodyChunks.push(chunk);
+					loggedBytes += chunk.length;
+				}
+			});
+
 			const doProxy = () => {
 				if (req.destroyed) return;
-
-				const MAX_LOG_BODY = 4096;
-				const bodyChunks: Buffer[] = [];
-				let loggedBytes = 0;
-
-				req.on('data', (chunk: Buffer) => {
-					if (loggedBytes < MAX_LOG_BODY) {
-						bodyChunks.push(chunk);
-						loggedBytes += chunk.length;
-					}
-				});
 
 				const forwardPath =
 					route.path && req.url?.startsWith(route.path)
@@ -318,7 +320,8 @@ const startServer = (certs: CertPathsForWorker): void => {
 	// The daemon's SNI TCP router on port 443 forwards traffic here.
 	httpsServer.listen(0, '127.0.0.1', () => {
 		const addr = httpsServer?.address() ?? null;
-		const assignedPort = typeof addr === 'object' && addr !== null ? addr.port : 0;
+		const assignedPort =
+			typeof addr === 'object' && addr !== null ? addr.port : 0;
 		emitEvent({ type: 'ready', port: assignedPort });
 	});
 

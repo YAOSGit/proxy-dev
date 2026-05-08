@@ -36,4 +36,4 @@ const writePlist = (
 	fs.writeFileSync(plistPath, plist, 'utf-8');
 };
 
-export { LABEL, generatePlist, writePlist };
+export { generatePlist, LABEL, writePlist };

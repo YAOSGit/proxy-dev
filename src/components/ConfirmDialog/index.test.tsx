@@ -11,17 +11,13 @@ describe('ConfirmDialog', () => {
 	});
 
 	it('renders yes option', () => {
-		const { lastFrame } = render(
-			<ConfirmDialog message="Confirm action?" />,
-		);
+		const { lastFrame } = render(<ConfirmDialog message="Confirm action?" />);
 		expect(lastFrame()).toContain('[y]');
 		expect(lastFrame()).toContain('yes');
 	});
 
 	it('renders no option', () => {
-		const { lastFrame } = render(
-			<ConfirmDialog message="Confirm action?" />,
-		);
+		const { lastFrame } = render(<ConfirmDialog message="Confirm action?" />);
 		expect(lastFrame()).toContain('[n]');
 		expect(lastFrame()).toContain('no');
 	});

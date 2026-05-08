@@ -57,10 +57,10 @@ const localConfigSchema = z.object({
 
 export {
 	globalConfigSchema,
-	localConfigSchema,
 	latencyConfigSchema,
-	routeSchema,
-	routeGroupSchema,
-	mockVariantSchema,
+	localConfigSchema,
 	mockRouteSchema,
+	mockVariantSchema,
+	routeGroupSchema,
+	routeSchema,
 };

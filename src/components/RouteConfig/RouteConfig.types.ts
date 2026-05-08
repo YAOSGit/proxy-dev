@@ -27,4 +27,4 @@ interface AddGroupFormProps {
 	configMode: ConfigMode;
 }
 
-export type { RouteConfigProps, AddRouteFormProps, AddGroupFormProps };
+export type { AddGroupFormProps, AddRouteFormProps, RouteConfigProps };

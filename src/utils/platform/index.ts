@@ -35,13 +35,13 @@ const getLaunchdPlistPath = (): string =>
 	);
 
 export {
-	getConfigDir,
 	getCertsDir,
-	getLeavesDir,
-	getHostsPath,
-	getPidPath,
-	getGlobalConfigPath,
-	getDaemonSocketPath,
+	getConfigDir,
 	getDaemonPidPath,
+	getDaemonSocketPath,
+	getGlobalConfigPath,
+	getHostsPath,
 	getLaunchdPlistPath,
+	getLeavesDir,
+	getPidPath,
 };

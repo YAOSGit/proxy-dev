@@ -1,9 +1,11 @@
+import type { BaseDeps, Command } from '@yaos-git/toolkit/types';
 import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
-import type { Command, BaseDeps } from '@yaos-git/toolkit/types';
 import { HelpMenu } from './index.js';
 
-const makeCommand = (overrides: Partial<Command<BaseDeps>> = {}): Command<BaseDeps> => ({
+const makeCommand = (
+	overrides: Partial<Command<BaseDeps>> = {},
+): Command<BaseDeps> => ({
 	id: 'test-cmd',
 	keys: [{ textKey: 'q' }],
 	displayKey: 'q',

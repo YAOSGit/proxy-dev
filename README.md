@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://github.com/YAOSGit/proxy-dev">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev.svg">
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev-light.svg">
-      <img src="https://raw.githubusercontent.com/YAOSGit/.github/main/profile/images/proxy-dev.svg" width="100%" alt="proxy-dev" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/images/proxy-dev.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/YAOSGit/.github/main/images/proxy-dev-light.svg">
+      <img src="https://raw.githubusercontent.com/YAOSGit/.github/main/images/proxy-dev.svg" width="100%" alt="proxy-dev" />
     </picture>
   </a>
 </p>
@@ -14,13 +14,13 @@
 
 <div align="center">
 
-![Node Version](https://img.shields.io/badge/NODE-18+-16161D?style=for-the-badge&logo=nodedotjs&logoColor=white&labelColor=%235FA04E)
-![TypeScript Version](https://img.shields.io/badge/TYPESCRIPT-5.9-16161D?style=for-the-badge&logo=typescript&logoColor=white&labelColor=%233178C6)
-![React Version](https://img.shields.io/badge/REACT-19.2-16161D?style=for-the-badge&logo=react&logoColor=black&labelColor=%2361DAFB)
+![Node Version](https://img.shields.io/badge/NODE-18+-16161D?style=for-the-badge&logo=nodedotjs&logoColor=white&labelColor=%23FF0088)
+![TypeScript Version](https://img.shields.io/badge/TYPESCRIPT-5.9-16161D?style=for-the-badge&logo=typescript&logoColor=white&labelColor=%23FF0088)
+![React Version](https://img.shields.io/badge/REACT-19.2-16161D?style=for-the-badge&logo=react&logoColor=white&labelColor=%23FF0088)
 
-![Uses Ink](https://img.shields.io/badge/INK-16161D?style=for-the-badge&logo=react&logoColor=white&labelColor=%2361DAFB)
-![Uses Vitest](https://img.shields.io/badge/VITEST-16161D?style=for-the-badge&logo=vitest&logoColor=white&labelColor=%236E9F18)
-![Uses Biome](https://img.shields.io/badge/BIOME-16161D?style=for-the-badge&logo=biome&logoColor=white&labelColor=%2360A5FA)
+![Uses Ink](https://img.shields.io/badge/INK-16161D?style=for-the-badge&logo=react&logoColor=white&labelColor=%23FF0088)
+![Uses Vitest](https://img.shields.io/badge/VITEST-16161D?style=for-the-badge&logo=vitest&logoColor=white&labelColor=%23FF0088)
+![Uses Biome](https://img.shields.io/badge/BIOME-16161D?style=for-the-badge&logo=biome&logoColor=white&labelColor=%23FF0088)
 
 </div>
 
@@ -194,11 +194,11 @@ The `examples/` directory contains ready-to-run configurations at three levels o
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [`basic/`](examples/basic/) | Single route group, minimal config, one backend |
-| [`custom/`](examples/custom/) | Mock variants, global latency, path-based routing |
-| [`integration/`](examples/integration/) | Three-service architecture with full mock coverage and workflow scripts |
+| [`single-route/`](examples/single-route/) | Single route group, minimal config, one backend |
+| [`mocks-and-latency/`](examples/mocks-and-latency/) | Mock variants, global latency, path-based routing |
+| [`microservices/`](examples/microservices/) | Three-service architecture with full mock coverage and workflow scripts |
 
-The basic example uses local config only (`proxy-dev.json`). Custom and integration demonstrate the global + local config split used in real projects.
+The single-route example uses local config only (`proxy-dev.json`). The other examples demonstrate the global + local config split used in real projects.
 
 ---
 

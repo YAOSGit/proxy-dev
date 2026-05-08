@@ -46,11 +46,11 @@ const removeAllProxyDevEntries = (content: string): string => {
 };
 
 export {
-	parseHostsFile,
-	getProxyDevEntries,
 	addEntry,
-	removeEntry,
-	removeAllProxyDevEntries,
-	PROXY_DEV_MARKER,
+	getProxyDevEntries,
 	PROXY_DEV_IP,
+	PROXY_DEV_MARKER,
+	parseHostsFile,
+	removeAllProxyDevEntries,
+	removeEntry,
 };

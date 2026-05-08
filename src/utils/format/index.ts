@@ -1,8 +1,8 @@
-import chalk, { type ChalkInstance } from 'chalk';
 import {
-	METHOD_COLORS as TOOLKIT_METHOD_COLORS,
 	statusColor,
+	METHOD_COLORS as TOOLKIT_METHOD_COLORS,
 } from '@yaos-git/toolkit/tui/http';
+import chalk, { type ChalkInstance } from 'chalk';
 
 const COLOR_FNS: Record<string, ChalkInstance> = {
 	green: chalk.green,
@@ -49,10 +49,10 @@ const formatRouteState = (state: 'LIVE' | 'MOCK'): string => {
 };
 
 export {
-	formatMethod,
-	formatStatus,
-	formatLatency,
-	truncateBody,
 	formatBytes,
+	formatLatency,
+	formatMethod,
 	formatRouteState,
+	formatStatus,
+	truncateBody,
 };

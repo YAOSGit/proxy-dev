@@ -1,12 +1,17 @@
 import { Box, Text } from 'ink';
+import { theme } from '../../theme.js';
 import {
 	formatLatency,
 	formatMethod,
 	formatRouteState,
 	formatStatus,
 } from '../../utils/format/index.js';
-import { theme } from '../../theme.js';
-import { DOMAIN_COLOR, EMPTY_STATE_COLOR, LATENCY_COLOR, PATH_COLOR } from './TrafficTable.consts.js';
+import {
+	DOMAIN_COLOR,
+	EMPTY_STATE_COLOR,
+	LATENCY_COLOR,
+	PATH_COLOR,
+} from './TrafficTable.consts.js';
 import type { TrafficTableProps } from './TrafficTable.types.js';
 
 export function TrafficTable({
@@ -50,7 +55,10 @@ export function TrafficTable({
 				const isSelected = globalIdx === selectedIndex;
 				return (
 					<Box key={entry.id} flexDirection="row" gap={1} paddingX={1}>
-						<Text color={isSelected ? theme.brand : undefined} bold={isSelected}>
+						<Text
+							color={isSelected ? theme.brand : undefined}
+							bold={isSelected}
+						>
 							{isSelected ? '▸' : ' '}
 						</Text>
 						<Text bold={isSelected}>{formatMethod(entry.method)}</Text>

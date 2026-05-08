@@ -24,11 +24,7 @@ export const snapshotCommand: ProxyDevCommand = {
 		if (!entry) return;
 		try {
 			const variantName = defaultVariantName(entry.status);
-			const filePath = buildMockFilePath(
-				entry.domain,
-				entry.path,
-				variantName,
-			);
+			const filePath = buildMockFilePath(entry.domain, entry.path, variantName);
 			writeMockFile(
 				filePath,
 				entry.responseBody ?? '',

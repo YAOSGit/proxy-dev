@@ -31,9 +31,9 @@ const isProxyError = (
 };
 
 export {
-	serializeCommand,
-	parseEvent,
+	isProxyError,
 	isProxyReady,
 	isProxyRequest,
-	isProxyError,
+	parseEvent,
+	serializeCommand,
 };

@@ -2,9 +2,17 @@ import { createCommandsProvider } from '@yaos-git/toolkit/tui/commands';
 import { clearCommand, reloadCommand, snapshotCommand } from './actions.js';
 import { backCommand } from './back.js';
 import { confirmNoCommand, confirmYesCommand } from './confirm.js';
-import { scrollDownCommand, scrollUpCommand, tabSwitchCommand } from './detail.js';
+import {
+	scrollDownCommand,
+	scrollUpCommand,
+	tabSwitchCommand,
+} from './detail.js';
 import { latencyConfirmCommand, latencyOpenCommand } from './latency.js';
-import { inspectCommand, navigateDownCommand, navigateUpCommand } from './navigation.js';
+import {
+	inspectCommand,
+	navigateDownCommand,
+	navigateUpCommand,
+} from './navigation.js';
 import { mockPickerCommand, routeConfigCommand } from './overlays.js';
 import {
 	rcDeleteCommand,
@@ -33,7 +41,8 @@ const PROJECT_COMMANDS: ProxyDevCommand[] = [
 		helpLabel: 'Exit proxy-dev',
 		footer: 'priority',
 		footerOrder: 99,
-		isEnabled: (deps) => deps.ui.activeOverlay === 'none' && !deps.isOverlayOpen,
+		isEnabled: (deps) =>
+			deps.ui.activeOverlay === 'none' && !deps.isOverlayOpen,
 		execute: (deps) => deps.onQuit(),
 		needsConfirmation: (deps) => deps.proxy.status === 'running',
 		confirmMessage: 'Proxy is running. Quit anyway?',
@@ -80,5 +89,5 @@ const PROJECT_COMMANDS: ProxyDevCommand[] = [
 const { CommandsProvider, useCommands, COMMANDS } =
 	createCommandsProvider<ProxyDevDeps>(PROJECT_COMMANDS);
 
-export { CommandsProvider, useCommands, COMMANDS, PROJECT_COMMANDS };
 export type { ProxyDevCommand, ProxyDevDeps } from './types.js';
+export { COMMANDS, CommandsProvider, PROJECT_COMMANDS, useCommands };

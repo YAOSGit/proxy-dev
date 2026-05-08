@@ -43,7 +43,11 @@ describe('Groups subcommand E2E', () => {
 	});
 
 	it('groups activate + deactivate round-trip', () => {
-		const activateOut = run(['groups', 'activate', 'staging'], undefined, tmpDir);
+		const activateOut = run(
+			['groups', 'activate', 'staging'],
+			undefined,
+			tmpDir,
+		);
 		expect(activateOut).toContain('Activated group');
 		expect(activateOut).toContain('staging');
 
@@ -52,7 +56,11 @@ describe('Groups subcommand E2E', () => {
 		const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 		expect(config.activeGroups).toContain('staging');
 
-		const deactivateOut = run(['groups', 'deactivate', 'staging'], undefined, tmpDir);
+		const deactivateOut = run(
+			['groups', 'deactivate', 'staging'],
+			undefined,
+			tmpDir,
+		);
 		expect(deactivateOut).toContain('Deactivated group');
 
 		const configAfter = JSON.parse(fs.readFileSync(configPath, 'utf-8'));

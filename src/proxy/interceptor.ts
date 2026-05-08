@@ -91,5 +91,5 @@ const collectBody = (req: IncomingMessage): Promise<string> => {
 	});
 };
 
-export { matchRoute, buildTrafficEntry, collectBody };
 export type { RouteWithMock };
+export { buildTrafficEntry, collectBody, matchRoute };

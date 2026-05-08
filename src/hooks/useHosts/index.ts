@@ -67,5 +67,5 @@ const useHosts = (): UseHostsReturn => {
 	};
 };
 
+export type { HostsStatus, UseHostsReturn };
 export { useHosts };
-export type { UseHostsReturn, HostsStatus };

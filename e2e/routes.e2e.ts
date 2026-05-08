@@ -70,7 +70,12 @@ describe('Routes subcommand E2E', () => {
 		fs.mkdirSync(configDir, { recursive: true });
 		fs.writeFileSync(
 			path.join(configDir, 'config.json'),
-			JSON.stringify({ version: 1, port: 443, groups: {}, latency: { globalMs: 0 } }),
+			JSON.stringify({
+				version: 1,
+				port: 443,
+				groups: {},
+				latency: { globalMs: 0 },
+			}),
 		);
 
 		const { stdout } = runSafe(['routes', 'list'], {
@@ -84,7 +89,12 @@ describe('Routes subcommand E2E', () => {
 		fs.mkdirSync(configDir, { recursive: true });
 		fs.writeFileSync(
 			path.join(configDir, 'config.json'),
-			JSON.stringify({ version: 1, port: 443, groups: {}, latency: { globalMs: 0 } }),
+			JSON.stringify({
+				version: 1,
+				port: 443,
+				groups: {},
+				latency: { globalMs: 0 },
+			}),
 		);
 		const env = { XDG_CONFIG_HOME: tmpDir };
 

@@ -13,7 +13,7 @@ describe('SystemHeader', () => {
 				proxyStatus="running"
 				lastError={null}
 				configMode="merged"
-				/>,
+			/>,
 		);
 		expect(lastFrame()).toContain('1m5s');
 	});
@@ -28,7 +28,7 @@ describe('SystemHeader', () => {
 				proxyStatus="running"
 				lastError={null}
 				configMode="merged"
-				/>,
+			/>,
 		);
 		expect(lastFrame()).toContain('3 hosts');
 	});
@@ -43,7 +43,7 @@ describe('SystemHeader', () => {
 				proxyStatus="running"
 				lastError={null}
 				configMode="merged"
-				/>,
+			/>,
 		);
 		expect(lastFrame()).toContain('trusted');
 	});
@@ -58,7 +58,7 @@ describe('SystemHeader', () => {
 				proxyStatus="running"
 				lastError={null}
 				configMode="merged"
-				/>,
+			/>,
 		);
 		const frame = lastFrame() ?? '';
 		expect(frame).toContain('CA:');

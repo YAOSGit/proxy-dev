@@ -1,5 +1,5 @@
-import * as esbuild from 'esbuild';
 import { createEsbuildConfig } from '@yaos-git/toolkit/build';
+import * as esbuild from 'esbuild';
 
 const shared = createEsbuildConfig({
 	entry: 'src/app/cli.ts', // placeholder, overridden per build

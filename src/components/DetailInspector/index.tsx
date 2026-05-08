@@ -1,5 +1,5 @@
-import { Box, Text } from 'ink';
 import { FocusablePane } from '@yaos-git/toolkit/tui/components';
+import { Box, Text } from 'ink';
 import { theme } from '../../theme.js';
 import { truncateBody } from '../../utils/format/index.js';
 import type { DetailInspectorProps } from './DetailInspector.types.js';

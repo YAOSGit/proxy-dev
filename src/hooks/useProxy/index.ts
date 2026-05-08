@@ -39,17 +39,25 @@ const useProxy = (
 	const domainsRef = useRef<string[]>([]);
 	/** Internal port the proxy worker is listening on (for updateRoutes diff). */
 	const portRef = useRef<number | null>(null);
+	/** Ref to track latest onTrafficEntry to avoid stale closure in worker handler. */
+	const onTrafficEntryRef = useRef(onTrafficEntry);
+	useEffect(() => {
+		onTrafficEntryRef.current = onTrafficEntry;
+	}, [onTrafficEntry]);
 
 	const sendCommand = useCallback((cmd: ProxyCommand) => {
 		workerRef.current?.postMessage(cmd);
 	}, []);
 
-	const registerDomains = useCallback((domains: string[], internalPort: number) => {
-		const client = new DaemonClient(getDaemonSocketPath());
-		for (const domain of domains) {
-			client.register(domain, internalPort).catch(() => {});
-		}
-	}, []);
+	const registerDomains = useCallback(
+		(domains: string[], internalPort: number) => {
+			const client = new DaemonClient(getDaemonSocketPath());
+			for (const domain of domains) {
+				client.register(domain, internalPort).catch(() => {});
+			}
+		},
+		[],
+	);
 
 	const unregisterDomains = useCallback((domains: string[]) => {
 		const client = new DaemonClient(getDaemonSocketPath());
@@ -79,7 +87,7 @@ const useProxy = (
 					portRef.current = event.port;
 					registerDomains(domainsRef.current, event.port);
 				} else if (event.type === 'request') {
-					onTrafficEntry(event.entry);
+					onTrafficEntryRef.current(event.entry);
 				} else if (event.type === 'error') {
 					setStatus('error');
 					setLastError(event.message);
@@ -107,7 +115,7 @@ const useProxy = (
 			};
 			worker.postMessage(startCmd);
 		},
-		[onTrafficEntry, registerDomains],
+		[registerDomains],
 	);
 
 	const stopProxy = useCallback(() => {
@@ -156,9 +164,13 @@ const useProxy = (
 
 	useEffect(() => {
 		return () => {
+			if (domainsRef.current.length > 0) {
+				unregisterDomains(domainsRef.current);
+				domainsRef.current = [];
+			}
 			workerRef.current?.terminate();
 		};
-	}, []);
+	}, [unregisterDomains]);
 
 	return {
 		status,
@@ -172,5 +184,5 @@ const useProxy = (
 	};
 };
 
+export type { ProxyStatus, UseProxyReturn };
 export { useProxy };
-export type { UseProxyReturn, ProxyStatus };

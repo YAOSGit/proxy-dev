@@ -11,4 +11,4 @@ const applyLatency = (ms: number): Promise<void> => {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export { resolveLatency, applyLatency };
+export { applyLatency, resolveLatency };

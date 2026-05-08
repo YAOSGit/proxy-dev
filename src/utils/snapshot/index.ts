@@ -119,9 +119,9 @@ const addMockToLocalConfig = (
 };
 
 export {
+	addMockToLocalConfig,
 	buildMockFilePath,
 	defaultVariantName,
-	writeMockFile,
 	readMockFile,
-	addMockToLocalConfig,
+	writeMockFile,
 };

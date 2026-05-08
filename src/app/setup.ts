@@ -125,5 +125,5 @@ const setup = async (opts?: {
 	};
 };
 
-export { setup };
 export type { SetupResult };
+export { setup };

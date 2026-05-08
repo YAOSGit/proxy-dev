@@ -65,5 +65,5 @@ const useTraffic = (): UseTrafficReturn => {
 	};
 };
 
-export { useTraffic, MAX_ENTRIES };
 export type { UseTrafficReturn };
+export { MAX_ENTRIES, useTraffic };

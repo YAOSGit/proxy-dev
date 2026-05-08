@@ -16,4 +16,4 @@ type ResolvedRoutes = {
 	routes: Route[];
 };
 
-export type { Route, RouteGroup, ResolvedRoutes };
+export type { ResolvedRoutes, Route, RouteGroup };

@@ -1,7 +1,13 @@
 #!/usr/bin/env node
+import {
+	createCLI,
+	fatalError,
+	formatError,
+	getExitCode,
+	runIfMain,
+} from '@yaos-git/toolkit/cli';
 import { Option } from 'commander';
 import { render } from 'ink';
-import { createCLI, fatalError, formatError, getExitCode, runIfMain } from '@yaos-git/toolkit/cli';
 import { App } from './index.js';
 import { setup } from './setup.js';
 
@@ -37,4 +43,6 @@ async function runTUI(args: string[] = process.argv.slice(2)): Promise<void> {
 	}
 }
 
-runIfMain(import.meta.url, () => { runTUI() });
+runIfMain(import.meta.url, () => {
+	runTUI();
+});

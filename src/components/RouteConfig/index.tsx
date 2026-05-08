@@ -96,7 +96,11 @@ const AddRouteForm = ({ groupName, onSave, onCancel }: AddRouteFormProps) => {
 			</Text>
 			<Box flexDirection="column">
 				<Box>
-					<Text color={step === 'domain' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>Domain: </Text>
+					<Text
+						color={step === 'domain' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}
+					>
+						Domain:{' '}
+					</Text>
 					<Text>
 						{domain}
 						{step === 'domain' && <Text color={CURSOR_COLOR}>|</Text>}
@@ -108,7 +112,9 @@ const AddRouteForm = ({ groupName, onSave, onCancel }: AddRouteFormProps) => {
 			</Box>
 			{step !== 'domain' && (
 				<Box>
-					<Text color={step === 'path' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>
+					<Text
+						color={step === 'path' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}
+					>
 						Path prefix (optional):{' '}
 					</Text>
 					<Text>
@@ -119,7 +125,9 @@ const AddRouteForm = ({ groupName, onSave, onCancel }: AddRouteFormProps) => {
 			)}
 			{(step === 'target' || step === 'upgrade') && (
 				<Box>
-					<Text color={step === 'target' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>
+					<Text
+						color={step === 'target' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}
+					>
 						Target port:{' '}
 					</Text>
 					<Text>
@@ -181,7 +189,9 @@ const AddGroupForm = ({ onSave, onCancel, configMode }: AddGroupFormProps) => {
 				Add Route Group
 			</Text>
 			<Box>
-				<Text color={step === 'name' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>Group Name: </Text>
+				<Text color={step === 'name' ? ACTIVE_STEP_COLOR : INACTIVE_STEP_COLOR}>
+					Group Name:{' '}
+				</Text>
 				<Text>
 					{name}
 					{step === 'name' && <Text color={CURSOR_COLOR}>|</Text>}
@@ -190,7 +200,13 @@ const AddGroupForm = ({ onSave, onCancel, configMode }: AddGroupFormProps) => {
 			{step === 'source' && (
 				<Box>
 					<Text color={ACTIVE_STEP_COLOR}>Source [l]ocal / [g]lobal: </Text>
-					<Text color={source === 'local' ? LOCAL_SOURCE_COLOR : GLOBAL_SOURCE_COLOR}>{source}</Text>
+					<Text
+						color={
+							source === 'local' ? LOCAL_SOURCE_COLOR : GLOBAL_SOURCE_COLOR
+						}
+					>
+						{source}
+					</Text>
 				</Box>
 			)}
 		</Box>
@@ -331,25 +347,42 @@ export function RouteConfig({
 							const tagged = taggedGroups[item.name];
 							const sourcePrefix =
 								configMode === 'merged' && tagged ? (
-									<Text color={tagged.source === 'global' ? GLOBAL_SOURCE_COLOR : LOCAL_SOURCE_COLOR}>
+									<Text
+										color={
+											tagged.source === 'global'
+												? GLOBAL_SOURCE_COLOR
+												: LOCAL_SOURCE_COLOR
+										}
+									>
 										{tagged.source}:{' '}
 									</Text>
 								) : null;
 							return (
 								<Box key={`group-${item.name}`} marginTop={i > 0 ? 1 : 0}>
 									{pointer}
-									<Text color={isActive ? ACTIVE_GROUP_COLOR : INACTIVE_GROUP_COLOR}>
+									<Text
+										color={isActive ? ACTIVE_GROUP_COLOR : INACTIVE_GROUP_COLOR}
+									>
 										{isActive ? '● ' : '○ '}
 									</Text>
 									{sourcePrefix}
 									<Text
 										bold
-										color={isSelected ? ACTIVE_STEP_COLOR : isActive ? ACTIVE_STEP_COLOR : INACTIVE_GROUP_COLOR}
+										color={
+											isSelected
+												? ACTIVE_STEP_COLOR
+												: isActive
+													? ACTIVE_STEP_COLOR
+													: INACTIVE_GROUP_COLOR
+										}
 									>
 										{item.name}
 									</Text>
 									{item.description && (
-										<Text color={INACTIVE_GROUP_COLOR}> — {item.description}</Text>
+										<Text color={INACTIVE_GROUP_COLOR}>
+											{' '}
+											— {item.description}
+										</Text>
 									)}
 								</Box>
 							);
@@ -363,7 +396,9 @@ export function RouteConfig({
 									{pointer}
 									<Box flexDirection="row" gap={1}>
 										<Text
-											color={isSelected ? ACTIVE_STEP_COLOR : INACTIVE_GROUP_COLOR}
+											color={
+												isSelected ? ACTIVE_STEP_COLOR : INACTIVE_GROUP_COLOR
+											}
 											dimColor={!isSelected}
 										>
 											→{' '}
@@ -377,7 +412,10 @@ export function RouteConfig({
 											<Text color={HTTPS_COLOR}>[HTTPS]</Text>
 										)}
 										{item.route.latencyMs !== undefined && (
-											<Text color={LATENCY_COLOR}> +{item.route.latencyMs}ms</Text>
+											<Text color={LATENCY_COLOR}>
+												{' '}
+												+{item.route.latencyMs}ms
+											</Text>
 										)}
 									</Box>
 								</Box>

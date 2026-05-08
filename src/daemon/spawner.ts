@@ -97,4 +97,4 @@ const spawnDaemon = async (
 	return waitForSocket(socketPath);
 };
 
-export { isDaemonRunning, cleanStaleDaemon, waitForSocket, spawnDaemon };
+export { cleanStaleDaemon, isDaemonRunning, spawnDaemon, waitForSocket };

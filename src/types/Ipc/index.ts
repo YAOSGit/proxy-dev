@@ -64,12 +64,12 @@ type ProxyEvent =
 	| { type: 'error'; message: string };
 
 export type {
-	HostCommand,
-	HostResponse,
+	CertPathsForWorker,
 	DaemonCommand,
 	DaemonResponse,
+	HostCommand,
+	HostResponse,
 	ProxyCommand,
 	ProxyEvent,
 	ResolvedRoutesForWorker,
-	CertPathsForWorker,
 };

@@ -244,5 +244,5 @@ const buildNoRoutePage = ({ req, availableRoutes }: NoRouteParams): string => {
 	return wrapPage('No Route Found', body);
 };
 
+export type { NoRouteParams, TargetDownParams };
 export { buildErrorPage, buildNoRoutePage };
-export type { TargetDownParams, NoRouteParams };

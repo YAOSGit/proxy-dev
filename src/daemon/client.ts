@@ -94,7 +94,11 @@ class DaemonClient {
 	}
 
 	async register(domain: string, port: number): Promise<void> {
-		const response = await this.sendCommand({ action: 'register', domain, port });
+		const response = await this.sendCommand({
+			action: 'register',
+			domain,
+			port,
+		});
 		if (!response.ok) {
 			throw new Error(response.error);
 		}

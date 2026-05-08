@@ -1,10 +1,18 @@
+import type {
+	OverlayState,
+	PendingConfirmation,
+} from '@yaos-git/toolkit/types';
 import { useCallback, useMemo, useState } from 'react';
-import type { OverlayState, PendingConfirmation } from '@yaos-git/toolkit/types';
 
 type ViewLevel = 'traffic' | 'detail';
 type DetailPane = 'request' | 'response';
 
-type ProxyOverlay = 'help' | 'mock' | 'confirmation' | 'routeConfig' | 'latency';
+type ProxyOverlay =
+	| 'help'
+	| 'mock'
+	| 'confirmation'
+	| 'routeConfig'
+	| 'latency';
 
 type UIState = {
 	viewLevel: ViewLevel;
@@ -158,42 +166,39 @@ const useUIState = (): UseUIStateReturn => {
 						? 'latency'
 						: 'none';
 
-	const setActiveOverlay = useCallback(
-		(overlay: string | 'none') => {
-			setState((s) => {
-				// Close all overlays first
-				const base: UIState = {
-					...s,
-					showHelp: false,
-					showMockPicker: false,
-					showConfirm: false,
-					showRouteConfig: false,
-					showLatencyInput: false,
-				};
-				// If closing confirm, also clear its message/callback
-				if (s.showConfirm && overlay !== 'confirmation') {
-					base.confirmMessage = '';
-					base.confirmCallback = null;
-				}
-				// Open the requested overlay
-				switch (overlay) {
-					case 'help':
-						return { ...base, showHelp: true };
-					case 'mock':
-						return { ...base, showMockPicker: true };
-					case 'confirmation':
-						return { ...base, showConfirm: true };
-					case 'routeConfig':
-						return { ...base, showRouteConfig: true };
-					case 'latency':
-						return { ...base, showLatencyInput: true };
-					default:
-						return base;
-				}
-			});
-		},
-		[],
-	);
+	const setActiveOverlay = useCallback((overlay: string | 'none') => {
+		setState((s) => {
+			// Close all overlays first
+			const base: UIState = {
+				...s,
+				showHelp: false,
+				showMockPicker: false,
+				showConfirm: false,
+				showRouteConfig: false,
+				showLatencyInput: false,
+			};
+			// If closing confirm, also clear its message/callback
+			if (s.showConfirm && overlay !== 'confirmation') {
+				base.confirmMessage = '';
+				base.confirmCallback = null;
+			}
+			// Open the requested overlay
+			switch (overlay) {
+				case 'help':
+					return { ...base, showHelp: true };
+				case 'mock':
+					return { ...base, showMockPicker: true };
+				case 'confirmation':
+					return { ...base, showConfirm: true };
+				case 'routeConfig':
+					return { ...base, showRouteConfig: true };
+				case 'latency':
+					return { ...base, showLatencyInput: true };
+				default:
+					return base;
+			}
+		});
+	}, []);
 
 	const confirmation: PendingConfirmation | null = useMemo(
 		() =>
@@ -253,5 +258,5 @@ const useUIState = (): UseUIStateReturn => {
 	};
 };
 
+export type { DetailPane, ProxyOverlay, UIState, UseUIStateReturn, ViewLevel };
 export { useUIState };
-export type { UseUIStateReturn, UIState, ViewLevel, DetailPane, ProxyOverlay };

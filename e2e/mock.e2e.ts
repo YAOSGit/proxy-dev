@@ -47,7 +47,11 @@ describe('Mock subcommand E2E', () => {
 		run(['mock', 'api.local/users', 'success'], undefined, tmpDir);
 
 		// Then disable it
-		const out = run(['mock', '--off', 'api.local/users', 'success'], undefined, tmpDir);
+		const out = run(
+			['mock', '--off', 'api.local/users', 'success'],
+			undefined,
+			tmpDir,
+		);
 		expect(out).toContain('Mock disabled');
 		expect(out).toContain('live mode');
 

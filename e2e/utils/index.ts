@@ -41,4 +41,4 @@ const runCLI = (args: string[], env?: Record<string, string>): string => {
 	}
 };
 
-export { createTestServer, createTempDir, runCLI };
+export { createTempDir, createTestServer, runCLI };

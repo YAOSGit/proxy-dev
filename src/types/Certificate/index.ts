@@ -8,4 +8,4 @@ type CACert = {
 	certPath: string;
 };
 
-export type { CertPaths, CACert };
+export type { CACert, CertPaths };

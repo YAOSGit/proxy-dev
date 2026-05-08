@@ -68,8 +68,13 @@ const extractSNI = (buf: Buffer): string | null => {
 			const listEnd = nameOffset + buf.readUInt16BE(offset);
 			while (nameOffset + 3 <= listEnd && nameOffset + 3 <= buf.length) {
 				const nameLen = buf.readUInt16BE(nameOffset + 1);
-				if (buf[nameOffset] === 0x00 && nameOffset + 3 + nameLen <= buf.length) {
-					return buf.subarray(nameOffset + 3, nameOffset + 3 + nameLen).toString('ascii');
+				if (
+					buf[nameOffset] === 0x00 &&
+					nameOffset + 3 + nameLen <= buf.length
+				) {
+					return buf
+						.subarray(nameOffset + 3, nameOffset + 3 + nameLen)
+						.toString('ascii');
 				}
 				nameOffset += 3 + nameLen;
 			}
@@ -161,6 +166,9 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 	// termination happens here.
 	const tcpRouter = net.createServer((clientSocket) => {
 		const onFirstChunk = (data: Buffer) => {
+			// Pause immediately so no data is lost between now and backend connect
+			clientSocket.pause();
+
 			const sni = extractSNI(data);
 			const backendPort = sni ? routeRegistry.get(sni) : undefined;
 
@@ -182,6 +190,7 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 				backendSocket.write(data); // replay the ClientHello to the backend
 				clientSocket.pipe(backendSocket);
 				backendSocket.pipe(clientSocket);
+				clientSocket.resume();
 			});
 		};
 
@@ -299,9 +308,15 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 
 		// Close all servers
 		await Promise.all([
-			new Promise<void>((resolve) => { server.close(() => resolve()); }),
-			new Promise<void>((resolve) => { tcpRouter.close(() => resolve()); }),
-			new Promise<void>((resolve) => { httpRedirect.close(() => resolve()); }),
+			new Promise<void>((resolve) => {
+				server.close(() => resolve());
+			}),
+			new Promise<void>((resolve) => {
+				tcpRouter.close(() => resolve());
+			}),
+			new Promise<void>((resolve) => {
+				httpRedirect.close(() => resolve());
+			}),
 		]);
 
 		// Remove socket file
@@ -355,5 +370,5 @@ const startDaemonServer = (config: DaemonServerConfig): DaemonServerHandle => {
 	};
 };
 
-export { startDaemonServer };
 export type { DaemonServerConfig, DaemonServerHandle };
+export { startDaemonServer };

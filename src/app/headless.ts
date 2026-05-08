@@ -40,7 +40,9 @@ const runHeadless = (
 
 		worker.on('message', (event: ProxyEvent) => {
 			if (event.type === 'ready') {
-				console.log(`Proxy worker listening on internal port ${event.port} (public via daemon:443)`);
+				console.log(
+					`Proxy worker listening on internal port ${event.port} (public via daemon:443)`,
+				);
 				console.log(
 					`Serving ${config.routes.length} route(s) for: ${domains.join(', ')}. Press Ctrl+C to stop.\n`,
 				);
@@ -83,4 +85,4 @@ const runHeadless = (
 	});
 };
 
-export { runHeadless, formatLogLine };
+export { formatLogLine, runHeadless };

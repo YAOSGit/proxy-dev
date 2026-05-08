@@ -233,20 +233,19 @@ const loadConfigByMode = (
 	};
 };
 
+export type { ConfigByModeResult };
 export {
-	loadGlobalConfig,
-	loadLocalConfig,
-	saveGlobalConfig,
-	saveLocalConfig,
 	bootstrapGlobalConfig,
 	bootstrapLocalConfig,
+	clearConfigWarnings,
+	getConfigWarnings,
+	loadConfigByMode,
+	loadGlobalConfig,
+	loadLocalConfig,
 	mergeConfigs,
 	resolveRoutes,
+	saveGlobalConfig,
+	saveLocalConfig,
 	validateGlobalConfig,
 	validateLocalConfig,
-	loadConfigByMode,
-	getConfigWarnings,
-	clearConfigWarnings,
 };
-
-export type { ConfigByModeResult };

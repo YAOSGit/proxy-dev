@@ -3,8 +3,14 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+	createCLI,
+	fatalError,
+	formatError,
+	getExitCode,
+	runIfMain,
+} from '@yaos-git/toolkit/cli';
 import { Option } from 'commander';
-import { createCLI, fatalError, formatError, getExitCode, runIfMain } from '@yaos-git/toolkit/cli';
 import {
 	checkDenoTrust,
 	checkFirefoxTrust,
@@ -37,7 +43,9 @@ import { getCertsDir, getPidPath } from '../utils/platform/index.js';
 
 declare const __CLI_VERSION__: string;
 
-export async function runCLI(args: string[] = process.argv.slice(2)): Promise<void> {
+export async function runCLI(
+	args: string[] = process.argv.slice(2),
+): Promise<void> {
 	const { program } = createCLI({
 		name: 'proxy-dev',
 		description: 'Local-first reverse proxy and interceptor',
@@ -70,7 +78,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			const { command, args } = getTrustCommand(ca.certPath);
 			console.log(`Running: ${command} ${args.join(' ')}`);
@@ -82,7 +91,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 				console.error(
 					'Failed to trust CA. You may need to provide sudo password.',
 				);
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			return;
 		});
@@ -94,7 +104,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const profilesDir = getFirefoxProfilesDir();
 			if (!fs.existsSync(profilesDir)) {
 				console.error('Firefox profiles directory not found.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 
 			const profiles = fs.readdirSync(profilesDir);
@@ -135,7 +146,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			const result = trustNode(ca.certPath);
 			const profileName = path.basename(getShellProfile());
@@ -158,7 +170,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			try {
 				const result = trustPython(ca.certPath, certsDir);
@@ -170,12 +183,15 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 						'✓ Generated combined CA bundle at ~/.config/proxy-dev/certs/combined-ca.pem',
 					);
 					console.log(`✓ Added REQUESTS_CA_BUNDLE to ~/${profileName}`);
-					console.log(`  Run: source ~/${profileName}  (or open a new terminal)`);
+					console.log(
+						`  Run: source ~/${profileName}  (or open a new terminal)`,
+					);
 				}
 			} catch (err) {
 				const msg = err instanceof Error ? err.message : String(err);
 				console.error(`Failed to configure Python trust: ${msg}`);
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			return;
 		});
@@ -188,7 +204,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			if (checkJavaTrust()) {
 				console.log('✓ CA already in JVM keystore (alias: proxy-dev)');
@@ -201,7 +218,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 				console.error(
 					'Failed to import CA. Ensure keytool is on your PATH and provide sudo password.',
 				);
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			return;
 		});
@@ -214,7 +232,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			const result = trustDeno(ca.certPath);
 			const profileName = path.basename(getShellProfile());
@@ -237,7 +256,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.error('No CA found. Run proxy-dev trust init first.');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			try {
 				const result = trustOpenssl(ca.certPath, certsDir);
@@ -249,12 +269,15 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 						'✓ Generated combined CA bundle at ~/.config/proxy-dev/certs/combined-ca.pem',
 					);
 					console.log(`✓ Added SSL_CERT_FILE to ~/${profileName}`);
-					console.log(`  Run: source ~/${profileName}  (or open a new terminal)`);
+					console.log(
+						`  Run: source ~/${profileName}  (or open a new terminal)`,
+					);
 				}
 			} catch (err) {
 				const msg = err instanceof Error ? err.message : String(err);
 				console.error(`Failed to configure OpenSSL trust: ${msg}`);
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 			return;
 		});
@@ -267,7 +290,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const ca = loadCA(certsDir);
 			if (!ca) {
 				console.log('No CA found. Run: proxy-dev trust init');
-				process.exitCode = 1; return;
+				process.exitCode = 1;
+				return;
 			}
 
 			const ok = (msg: string) => `  \x1b[32m✓\x1b[0m ${msg}`;
@@ -322,7 +346,11 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 	program
 		.command('start')
 		.option('-c, --config <path>', 'Config file path')
-		.addOption(new Option('--mode <mode>', 'Config mode: local, global, or merged').default('merged').choices(['local', 'global', 'merged']))
+		.addOption(
+			new Option('--mode <mode>', 'Config mode: local, global, or merged')
+				.default('merged')
+				.choices(['local', 'global', 'merged']),
+		)
 		.action(async (opts: { config?: string; mode?: string }) => {
 			const { setup } = await import('./setup.js');
 			const { runHeadless } = await import('./headless.js');
@@ -342,7 +370,8 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		if (Number.isNaN(pid) || pid <= 0) {
 			console.error('PID file contains invalid value. Removing stale file.');
 			fs.unlinkSync(pidPath);
-			process.exitCode = 1; return;
+			process.exitCode = 1;
+			return;
 		}
 		try {
 			process.kill(pid, 'SIGTERM');
@@ -363,10 +392,13 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		.description('Check if daemon is running')
 		.action(async () => {
 			const { isDaemonRunning } = await import('../daemon/index.js');
-			const { getDaemonSocketPath } = await import('../utils/platform/index.js');
+			const { getDaemonSocketPath } = await import(
+				'../utils/platform/index.js'
+			);
 			const running = await isDaemonRunning(getDaemonSocketPath());
 			console.log(running ? 'Daemon is running.' : 'Daemon is not running.');
-			process.exitCode = running ? 0 : 1; return;
+			process.exitCode = running ? 0 : 1;
+			return;
 		});
 
 	daemonCmd
@@ -376,7 +408,9 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 			const { DaemonClient, isDaemonRunning } = await import(
 				'../daemon/index.js'
 			);
-			const { getDaemonSocketPath } = await import('../utils/platform/index.js');
+			const { getDaemonSocketPath } = await import(
+				'../utils/platform/index.js'
+			);
 			const socketPath = getDaemonSocketPath();
 			if (!(await isDaemonRunning(socketPath))) {
 				console.log('Daemon is not running.');
@@ -392,7 +426,9 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		.description('Install daemon as launchd service (macOS)')
 		.action(async () => {
 			const { writePlist } = await import('../daemon/index.js');
-			const { getLaunchdPlistPath } = await import('../utils/platform/index.js');
+			const { getLaunchdPlistPath } = await import(
+				'../utils/platform/index.js'
+			);
 			const plistPath = getLaunchdPlistPath();
 			const __dirname = path.dirname(fileURLToPath(import.meta.url));
 			const daemonPath = path.resolve(__dirname, 'daemon.js');
@@ -411,7 +447,9 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		.command('uninstall')
 		.description('Remove daemon launchd service')
 		.action(async () => {
-			const { getLaunchdPlistPath } = await import('../utils/platform/index.js');
+			const { getLaunchdPlistPath } = await import(
+				'../utils/platform/index.js'
+			);
 			const plistPath = getLaunchdPlistPath();
 			try {
 				execFileSync('launchctl', ['unload', plistPath], { stdio: 'inherit' });
@@ -451,7 +489,11 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		.option('-g, --group <name>', 'Group name', 'default')
 		.option('-p, --path <path>', 'Path prefix')
 		.action(
-			(domain: string, port: string, opts: { group: string; path?: string }) => {
+			(
+				domain: string,
+				port: string,
+				opts: { group: string; path?: string },
+			) => {
 				const global = loadGlobalConfig();
 				if (!global.groups[opts.group]) {
 					global.groups[opts.group] = { routes: [] };
@@ -483,7 +525,9 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		});
 
 	// groups command
-	const groupsCmd = program.command('groups').description('Manage route groups');
+	const groupsCmd = program
+		.command('groups')
+		.description('Manage route groups');
 
 	groupsCmd
 		.command('activate <name>')
@@ -532,14 +576,16 @@ export async function runCLI(args: string[] = process.argv.slice(2)): Promise<vo
 		});
 
 	try {
-		await program.parseAsync(args, { from: 'user' })
+		await program.parseAsync(args, { from: 'user' });
 	} catch (err) {
 		if (err instanceof Error && 'exitCode' in err) {
-			process.exitCode = getExitCode(err)
+			process.exitCode = getExitCode(err);
 		} else {
-			fatalError(formatError(err))
+			fatalError(formatError(err));
 		}
 	}
 }
 
-runIfMain(import.meta.url, () => { runCLI() })
+runIfMain(import.meta.url, () => {
+	runCLI();
+});

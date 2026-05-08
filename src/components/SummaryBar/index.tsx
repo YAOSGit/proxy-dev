@@ -1,6 +1,13 @@
 import { Box, Text } from 'ink';
 import { formatBytes } from '../../utils/format/index.js';
-import { BORDER_COLOR, CONTENT_TYPE_COLOR, COUNT_COLOR, EMPTY_STATE_COLOR, LABEL_COLOR, SIZE_COLOR } from './SummaryBar.consts.js';
+import {
+	BORDER_COLOR,
+	CONTENT_TYPE_COLOR,
+	COUNT_COLOR,
+	EMPTY_STATE_COLOR,
+	LABEL_COLOR,
+	SIZE_COLOR,
+} from './SummaryBar.consts.js';
 import type { SummaryBarProps } from './SummaryBar.types.js';
 
 export function SummaryBar(props: SummaryBarProps) {

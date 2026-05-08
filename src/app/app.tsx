@@ -1,7 +1,7 @@
 import path from 'node:path';
+import { TUILayout } from '@yaos-git/toolkit/tui/components';
 import { useInput, useStdout } from 'ink';
 import { useEffect, useMemo, useState } from 'react';
-import { TUILayout } from '@yaos-git/toolkit/tui/components';
 import { COMMANDS, CommandsProvider } from '../commands/index.js';
 import type { ProxyDevDeps } from '../commands/types.js';
 import { DetailInspector } from '../components/DetailInspector/index.js';
@@ -203,7 +203,10 @@ export function AppContent() {
 			>
 				{content}
 			</TUILayout>
-			<LatencyInputHandler showLatencyInput={ui.activeOverlay === 'latency'} setLatencyInput={setLatencyInput} />
+			<LatencyInputHandler
+				showLatencyInput={ui.activeOverlay === 'latency'}
+				setLatencyInput={setLatencyInput}
+			/>
 		</CommandsProvider>
 	);
 }

@@ -157,4 +157,4 @@ const ensureLeafCert = (
 	return generateLeaf(domain, ca, leavesDir);
 };
 
-export { generateLeaf, ensureLeafCert };
+export { ensureLeafCert, generateLeaf };

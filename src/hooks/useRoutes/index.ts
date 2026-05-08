@@ -227,5 +227,5 @@ const useRoutes = (mode: ConfigMode = 'merged'): UseRoutesReturn => {
 	};
 };
 
-export { useRoutes };
 export type { UseRoutesReturn };
+export { useRoutes };

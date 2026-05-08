@@ -43,8 +43,12 @@ export function MockPicker({
 							<Text color={isActive ? ACTIVE_VARIANT_COLOR : NORMAL_TEXT_COLOR}>
 								{isActive ? '●' : '○'}
 							</Text>
-							<Text color={isSelected ? POINTER_COLOR : NORMAL_TEXT_COLOR}>{opt.name}</Text>
-							{opt.status !== null && <Text color={META_COLOR}>({opt.status})</Text>}
+							<Text color={isSelected ? POINTER_COLOR : NORMAL_TEXT_COLOR}>
+								{opt.name}
+							</Text>
+							{opt.status !== null && (
+								<Text color={META_COLOR}>({opt.status})</Text>
+							)}
 							{opt.file && (
 								<Text color={META_COLOR} dimColor>
 									{opt.file}

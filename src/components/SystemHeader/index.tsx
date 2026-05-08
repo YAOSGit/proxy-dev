@@ -34,7 +34,8 @@ export function SystemHeader(props: SystemHeaderProps) {
 		configMode,
 		configWarnings,
 	} = props;
-	const statusColor = PROXY_STATUS_COLORS[proxyStatus] ?? PROXY_STATUS_COLORS.starting;
+	const statusColor =
+		PROXY_STATUS_COLORS[proxyStatus] ?? PROXY_STATUS_COLORS.starting;
 	const modeColor = CONFIG_MODE_COLORS[configMode] ?? CONFIG_MODE_COLORS.merged;
 
 	return (
@@ -59,8 +60,10 @@ export function SystemHeader(props: SystemHeaderProps) {
 				</Text>
 				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text>
-					<Text color={hostCount > 0 ? HOST_ACTIVE_COLOR : HOST_INACTIVE_COLOR}>●</Text> {hostCount}{' '}
-					hosts
+					<Text color={hostCount > 0 ? HOST_ACTIVE_COLOR : HOST_INACTIVE_COLOR}>
+						●
+					</Text>{' '}
+					{hostCount} hosts
 				</Text>
 				<Text color={SEPARATOR_COLOR}>|</Text>
 				<Text color={caTrusted ? CA_TRUSTED_COLOR : CA_UNTRUSTED_COLOR}>

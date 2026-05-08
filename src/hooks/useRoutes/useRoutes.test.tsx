@@ -14,9 +14,9 @@ vi.mock('../../utils/config/index.js', () => ({
 		latency: { globalMs: 0 },
 	}),
 	loadLocalConfig: vi.fn().mockReturnValue(null),
-	resolveRoutes: vi.fn().mockReturnValue([
-		{ domain: 'api.local', target: 3000, groupName: 'api' },
-	]),
+	resolveRoutes: vi
+		.fn()
+		.mockReturnValue([{ domain: 'api.local', target: 3000, groupName: 'api' }]),
 	saveGlobalConfig: vi.fn(),
 	saveLocalConfig: vi.fn(),
 }));
