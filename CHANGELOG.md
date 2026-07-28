@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [226.1.4] - 2026-07-28
+
+### Added
+- Daemon lifecycle log at `<config dir>/daemon.log` — the daemon runs detached with stdio
+  ignored, so starts, signals, crashes (uncaughtException/unhandledRejection), and exits now
+  leave evidence; a silently-dead daemon is finally diagnosable. Signal handlers also log
+  SIGHUP/SIGTERM/SIGINT before exiting.
+
 ## [226.1.3] - 2026-07-28
 
 ### Fixed
