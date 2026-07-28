@@ -46,10 +46,17 @@ const runHeadless = (
 				console.log(
 					`Serving ${config.routes.length} route(s) for: ${domains.join(', ')}. Press Ctrl+C to stop.\n`,
 				);
-				// Register all domains with the daemon's SNI router
+				// Register all domains with the daemon's SNI router AND /etc/hosts. The TUI
+				// does the hosts half via useHosts; headless must do it itself — without it
+				// the domains never resolve (setup's cleanup already removes them on exit).
 				const client = new DaemonClient(getDaemonSocketPath());
 				for (const domain of domains) {
 					client.register(domain, event.port).catch(() => {});
+					client
+						.addHost(domain)
+						.catch((err: Error) =>
+							console.error(`[hosts] failed to add ${domain}: ${err.message}`),
+						);
 				}
 			} else if (event.type === 'request') {
 				console.log(formatLogLine(event.entry));

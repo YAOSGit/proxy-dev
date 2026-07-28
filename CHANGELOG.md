@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [226.1.1] - 2026-07-28
+
+### Fixed
+- Headless `start` never wrote its domains to /etc/hosts — it registered them with the
+  daemon's SNI router only, so `.test`/`.local` domains resolved solely under the TUI (whose
+  useHosts hook did the hosts half). Headless now calls `addHost` alongside `register`,
+  matching the cleanup path that already removed hosts on exit.
+
 ## [226.1.0] - 2026-07-28
 
 ### Added
