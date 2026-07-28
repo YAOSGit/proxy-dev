@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [226.1.3] - 2026-07-28
+
+### Fixed
+- The daemon died when the terminal that ran `daemon start` was closed (SIGHUP via the
+  inherited controlling tty). The spawn is now two-stage: sudo keeps the tty so it can
+  prompt, and a root bootstrap spawns the real daemon `detached` into its own session —
+  surviving Ctrl+C, CLI exit, and terminal close alike.
+
 ## [226.1.2] - 2026-07-28
 
 ### Fixed

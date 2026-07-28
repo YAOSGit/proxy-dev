@@ -67,15 +67,25 @@ const spawnDaemon = async (
 
 	cleanStaleDaemon(socketPath, pidPath);
 
+	// Two-stage spawn. sudo itself must NOT be detached (it reads the password from
+	// the controlling terminal, which a new session lacks) — but the daemon must NOT
+	// keep that terminal (a non-detached daemon dies of SIGHUP when the terminal that
+	// ran `daemon start` closes). So sudo runs a tiny root bootstrap on the tty, and
+	// the bootstrap — already root, no prompt needed — spawns the real daemon detached
+	// into its own session, then exits.
+	const bootstrap =
+		"require('node:child_process').spawn(process.argv[1], [process.argv[2]], { detached: true, stdio: 'ignore', env: process.env }).unref();";
 	const child = spawn(
 		'sudo',
-		['--preserve-env=PROXY_DEV_SOCKET', process.execPath, daemonScriptPath],
+		[
+			'--preserve-env=PROXY_DEV_SOCKET',
+			process.execPath,
+			'-e',
+			bootstrap,
+			process.execPath,
+			daemonScriptPath,
+		],
 		{
-			// NOT detached: sudo reads the password from the controlling terminal
-			// (/dev/tty), which a detached (new-session) child does not have. The
-			// daemon still outlives us — once this command exits, its process group
-			// is no longer the foreground group, so a later Ctrl+C never reaches it.
-			// (The old danger window was the post-success hang below.)
 			stdio: ['ignore', 'ignore', 'pipe'],
 			env: { ...process.env, PROXY_DEV_SOCKET: socketPath },
 		},
