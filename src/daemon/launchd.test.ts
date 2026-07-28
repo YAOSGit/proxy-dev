@@ -18,12 +18,15 @@ describe('launchd plist', () => {
 	it('generates valid plist XML', () => {
 		const nodePath = '/usr/local/bin/node';
 		const scriptPath = '/opt/proxy-dev/daemon.js';
-		const plist = generatePlist(nodePath, scriptPath);
+		const plist = generatePlist(nodePath, scriptPath, '/home/u/.config/proxy-dev/daemon.sock');
 
 		expect(plist).toContain('<?xml version="1.0" encoding="UTF-8"?>');
 		expect(plist).toContain(`<string>${LABEL}</string>`);
 		expect(plist).toContain(`<string>${nodePath}</string>`);
 		expect(plist).toContain(`<string>${scriptPath}</string>`);
+		expect(plist).toContain('<key>EnvironmentVariables</key>');
+		expect(plist).toContain('<key>PROXY_DEV_SOCKET</key>');
+		expect(plist).toContain('<string>/home/u/.config/proxy-dev/daemon.sock</string>');
 		expect(plist).toContain('<key>RunAtLoad</key>');
 		expect(plist).toContain('<true/>');
 		expect(plist).toContain('<key>KeepAlive</key>');
@@ -38,7 +41,7 @@ describe('launchd plist', () => {
 		const nodePath = '/usr/local/bin/node';
 		const scriptPath = '/opt/proxy-dev/daemon.js';
 
-		writePlist(plistPath, nodePath, scriptPath);
+		writePlist(plistPath, nodePath, scriptPath, '/home/u/.config/proxy-dev/daemon.sock');
 
 		expect(fs.existsSync(plistPath)).toBe(true);
 

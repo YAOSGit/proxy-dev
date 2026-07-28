@@ -435,44 +435,137 @@ export async function runCLI(
 
 	daemonCmd
 		.command('install')
-		.description('Install daemon as launchd service (macOS)')
+		.description(
+			'Install daemon as a root system service — launchd (macOS) / systemd (Linux); restarts on crash, runs at boot',
+		)
 		.action(async () => {
-			const { writePlist } = await import('../daemon/index.js');
-			const { getLaunchdPlistPath } = await import(
-				'../utils/platform/index.js'
-			);
-			const plistPath = getLaunchdPlistPath();
+			const { generatePlist, generateUnit, LABEL, SERVICE_NAME, DaemonClient, isDaemonRunning } =
+				await import('../daemon/index.js');
+			const { getLaunchdPlistPath, getSystemdUnitPath, getDaemonSocketPath } =
+				await import('../utils/platform/index.js');
+
+			if (process.platform !== 'darwin' && process.platform !== 'linux') {
+				console.error(`daemon install is not supported on ${process.platform}.`);
+				process.exitCode = 1;
+				return;
+			}
+
 			const __dirname = path.dirname(fileURLToPath(import.meta.url));
 			const daemonPath = path.resolve(__dirname, 'daemon.js');
-			writePlist(plistPath, process.execPath, daemonPath);
-			console.log(`Plist written to ${plistPath}`);
+			const socketPath = getDaemonSocketPath();
+
+			console.log('Installing the daemon as a root system service (sudo)...');
 			try {
-				execFileSync('launchctl', ['load', plistPath], { stdio: 'inherit' });
-				console.log('  Daemon service loaded.');
+				execFileSync('sudo', ['-v'], { stdio: 'inherit' });
 			} catch {
-				console.error('Failed to load launchd service. Run manually:');
-				console.error(`  launchctl load ${plistPath}`);
+				console.error('\n  Authentication failed or was cancelled.');
+				process.exitCode = 1;
+				return;
+			}
+
+			// Hand the socket over: an ad-hoc daemon (from `daemon start`) would hold it.
+			if (await isDaemonRunning(socketPath)) {
+				await new DaemonClient(socketPath).shutdown().catch(() => {});
+			}
+
+			const os = await import('node:os');
+			const tmpFile = path.join(os.tmpdir(), `proxy-dev-service-${process.pid}`);
+
+			if (process.platform === 'darwin') {
+				const plistPath = getLaunchdPlistPath();
+				fs.writeFileSync(tmpFile, generatePlist(process.execPath, daemonPath, socketPath));
+				try {
+					execFileSync(
+						'sudo',
+						['install', '-o', 'root', '-g', 'wheel', '-m', '644', tmpFile, plistPath],
+						{ stdio: 'inherit' },
+					);
+					try {
+						execFileSync('sudo', ['launchctl', 'bootout', `system/${LABEL}`], {
+							stdio: 'ignore',
+						});
+					} catch {
+						/* not previously loaded */
+					}
+					execFileSync('sudo', ['launchctl', 'bootstrap', 'system', plistPath], {
+						stdio: 'inherit',
+					});
+					console.log(`  LaunchDaemon installed (${plistPath}) and started.`);
+					console.log('  It now survives crashes and reboots — `daemon start` is no longer needed.');
+				} finally {
+					fs.rmSync(tmpFile, { force: true });
+				}
+				return;
+			}
+
+			// linux
+			const unitPath = getSystemdUnitPath();
+			fs.writeFileSync(tmpFile, generateUnit(process.execPath, daemonPath, socketPath));
+			try {
+				execFileSync(
+					'sudo',
+					['install', '-o', 'root', '-g', 'root', '-m', '644', tmpFile, unitPath],
+					{ stdio: 'inherit' },
+				);
+				execFileSync('sudo', ['systemctl', 'daemon-reload'], { stdio: 'inherit' });
+				execFileSync('sudo', ['systemctl', 'enable', '--now', SERVICE_NAME], {
+					stdio: 'inherit',
+				});
+				console.log(`  systemd unit installed (${unitPath}) and started.`);
+				console.log('  It now survives crashes and reboots — `daemon start` is no longer needed.');
+			} finally {
+				fs.rmSync(tmpFile, { force: true });
 			}
 		});
 
 	daemonCmd
 		.command('uninstall')
-		.description('Remove daemon launchd service')
+		.description('Remove daemon system service — launchd (macOS) / systemd (Linux)')
 		.action(async () => {
-			const { getLaunchdPlistPath } = await import(
+			const { LABEL, SERVICE_NAME } = await import('../daemon/index.js');
+			const { getLaunchdPlistPath, getSystemdUnitPath } = await import(
 				'../utils/platform/index.js'
 			);
-			const plistPath = getLaunchdPlistPath();
-			try {
-				execFileSync('launchctl', ['unload', plistPath], { stdio: 'inherit' });
-			} catch {
-				/* may not be loaded */
+
+			if (process.platform === 'darwin') {
+				const plistPath = getLaunchdPlistPath();
+				try {
+					execFileSync('sudo', ['launchctl', 'bootout', `system/${LABEL}`], {
+						stdio: 'inherit',
+					});
+				} catch {
+					/* may not be loaded */
+				}
+				try {
+					execFileSync('sudo', ['rm', '-f', plistPath], { stdio: 'inherit' });
+				} catch {
+					/* may not exist */
+				}
+				console.log('Daemon service uninstalled.');
+				return;
 			}
-			if (fs.existsSync(plistPath)) {
-				fs.unlinkSync(plistPath);
-				console.log('Plist removed.');
+
+			if (process.platform === 'linux') {
+				const unitPath = getSystemdUnitPath();
+				try {
+					execFileSync('sudo', ['systemctl', 'disable', '--now', SERVICE_NAME], {
+						stdio: 'inherit',
+					});
+				} catch {
+					/* may not be enabled */
+				}
+				try {
+					execFileSync('sudo', ['rm', '-f', unitPath], { stdio: 'inherit' });
+					execFileSync('sudo', ['systemctl', 'daemon-reload'], { stdio: 'inherit' });
+				} catch {
+					/* may not exist */
+				}
+				console.log('Daemon service uninstalled.');
+				return;
 			}
-			console.log('Daemon service uninstalled.');
+
+			console.error(`daemon uninstall is not supported on ${process.platform}.`);
+			process.exitCode = 1;
 		});
 
 	// routes command

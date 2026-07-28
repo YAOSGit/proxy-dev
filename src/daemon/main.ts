@@ -10,7 +10,9 @@ const configDir = process.env.XDG_CONFIG_HOME
 
 const socketPath =
 	process.env.PROXY_DEV_SOCKET ?? path.join(configDir, 'daemon.sock');
-const pidPath = path.join(configDir, 'daemon.pid');
+// Derive from the socket, not from HOME: under launchd there is no user HOME, and the pid
+// file must live next to the socket the CLI actually talks to.
+const pidPath = path.join(path.dirname(socketPath), 'daemon.pid');
 
 const hostsPath =
 	process.platform === 'win32'

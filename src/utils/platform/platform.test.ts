@@ -40,9 +40,9 @@ describe('platform utils', () => {
 		expect(pidPath).toMatch(/daemon\.pid$/);
 	});
 
-	it('getLaunchdPlistPath returns LaunchAgents path', () => {
+	it('getLaunchdPlistPath returns the root LaunchDaemons path', () => {
 		const plistPath = getLaunchdPlistPath();
-		expect(plistPath).toContain('LaunchAgents');
+		expect(plistPath).toContain('/Library/LaunchDaemons');
 		expect(plistPath).toMatch(/\.plist$/);
 	});
 });

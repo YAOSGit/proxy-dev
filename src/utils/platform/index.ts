@@ -26,13 +26,13 @@ const getDaemonSocketPath = (): string =>
 
 const getDaemonPidPath = (): string => path.join(getConfigDir(), 'daemon.pid');
 
+const getSystemdUnitPath = (): string =>
+	path.join('/etc', 'systemd', 'system', 'proxy-dev-daemon.service');
+
+// Root LaunchDaemon, NOT a user LaunchAgent: the daemon edits /etc/hosts, so it must run
+// as root — and only system-domain daemons get KeepAlive across crashes and boot.
 const getLaunchdPlistPath = (): string =>
-	path.join(
-		os.homedir(),
-		'Library',
-		'LaunchAgents',
-		'com.yaos-git.proxy-dev.plist',
-	);
+	path.join('/Library', 'LaunchDaemons', 'com.yaos-git.proxy-dev.plist');
 
 export {
 	getCertsDir,
@@ -42,6 +42,7 @@ export {
 	getGlobalConfigPath,
 	getHostsPath,
 	getLaunchdPlistPath,
+	getSystemdUnitPath,
 	getLeavesDir,
 	getPidPath,
 };

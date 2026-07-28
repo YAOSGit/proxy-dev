@@ -151,7 +151,8 @@ proxy-dev-tui
 | `proxy-dev groups activate <name>` | Activate a route group locally |
 | `proxy-dev groups deactivate <name>` | Deactivate a route group locally |
 | `proxy-dev mock <route> <variant>` | Set active mock variant (use `--off` for live) |
-| `proxy-dev daemon start` | Start the hosts daemon (the one sudo step; `start` is then sudo-free) |
+| `proxy-dev daemon install` | Install the daemon as a root system service (launchd/systemd) — survives crashes and reboots (recommended) |
+| `proxy-dev daemon start` | Start the hosts daemon ad-hoc (one sudo per boot) |
 | `proxy-dev daemon status` | Check if hosts daemon is running |
 | `proxy-dev daemon stop` | Stop the hosts daemon |
 

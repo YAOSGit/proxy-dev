@@ -54,12 +54,12 @@ describe('Daemon subcommand E2E', () => {
 
 	it('daemon install --help shows install description', () => {
 		const out = run(['daemon', 'install', '--help']);
-		expect(out).toContain('Install daemon as launchd service');
+		expect(out).toContain('Install daemon as a root system service');
 	});
 
 	it('daemon uninstall --help shows uninstall description', () => {
 		const out = run(['daemon', 'uninstall', '--help']);
-		expect(out).toContain('Remove daemon launchd service');
+		expect(out).toContain('Remove daemon system service');
 	});
 
 	it('daemon stop --help shows stop description', () => {

@@ -5,9 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
-## [226.1.4] - 2026-07-28
+## [226.2.0] - 2026-07-28
 
 ### Added
+- `daemon install` reworked into a ROOT system service on both platforms — launchd
+  LaunchDaemon (macOS, `launchctl bootstrap system`) and systemd unit (Linux,
+  `systemctl enable --now`, `Restart=always`). One sudo at install; the daemon then
+  survives crashes and reboots, retiring the once-per-boot `daemon start`. The service
+  bakes `PROXY_DEV_SOCKET` in (system services have no user HOME) and `daemon install`
+  hands over from a running ad-hoc daemon first. The previous implementation wrote a USER
+  LaunchAgent, which could never edit /etc/hosts.
 - Daemon lifecycle log at `<config dir>/daemon.log` — the daemon runs detached with stdio
   ignored, so starts, signals, crashes (uncaughtException/unhandledRejection), and exits now
   leave evidence; a silently-dead daemon is finally diagnosable. Signal handlers also log
