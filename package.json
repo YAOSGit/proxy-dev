@@ -1,6 +1,6 @@
 {
 	"name": "@yaos-git/proxy-dev",
-	"version": "226.0.1",
+	"version": "226.1.0",
 	"description": "Local-first reverse proxy and interceptor with TUI dashboard",
 	"main": "dist/cli.js",
 	"exports": {
