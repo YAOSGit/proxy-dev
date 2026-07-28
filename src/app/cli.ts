@@ -441,8 +441,12 @@ export async function runCLI(
 		.action(async () => {
 			const { generatePlist, generateUnit, LABEL, SERVICE_NAME, DaemonClient, isDaemonRunning } =
 				await import('../daemon/index.js');
-			const { getLaunchdPlistPath, getSystemdUnitPath, getDaemonSocketPath } =
-				await import('../utils/platform/index.js');
+			const {
+				getLaunchdPlistPath,
+				getSystemdUnitPath,
+				getDaemonSocketPath,
+				getServiceDaemonDir,
+			} = await import('../utils/platform/index.js');
 
 			if (process.platform !== 'darwin' && process.platform !== 'linux') {
 				console.error(`daemon install is not supported on ${process.platform}.`);
@@ -451,7 +455,7 @@ export async function runCLI(
 			}
 
 			const __dirname = path.dirname(fileURLToPath(import.meta.url));
-			const daemonPath = path.resolve(__dirname, 'daemon.js');
+			const sourceDaemonPath = path.resolve(__dirname, 'daemon.js');
 			const socketPath = getDaemonSocketPath();
 
 			console.log('Installing the daemon as a root system service (sudo)...');
@@ -462,6 +466,18 @@ export async function runCLI(
 				process.exitCode = 1;
 				return;
 			}
+
+			// Copy the (self-contained) daemon bundle to a system path. A service must not
+			// execute from the install location: user paths churn, and macOS TCC denies even
+			// root access to Desktop/Documents (EPERM crash-loop).
+			const serviceDir = getServiceDaemonDir();
+			const daemonPath = path.join(serviceDir, 'daemon.js');
+			execFileSync('sudo', ['mkdir', '-p', serviceDir], { stdio: 'inherit' });
+			execFileSync(
+				'sudo',
+				['install', '-o', 'root', '-m', '755', sourceDaemonPath, daemonPath],
+				{ stdio: 'inherit' },
+			);
 
 			// Hand the socket over: an ad-hoc daemon (from `daemon start`) would hold it.
 			if (await isDaemonRunning(socketPath)) {
@@ -523,9 +539,8 @@ export async function runCLI(
 		.description('Remove daemon system service — launchd (macOS) / systemd (Linux)')
 		.action(async () => {
 			const { LABEL, SERVICE_NAME } = await import('../daemon/index.js');
-			const { getLaunchdPlistPath, getSystemdUnitPath } = await import(
-				'../utils/platform/index.js'
-			);
+			const { getLaunchdPlistPath, getSystemdUnitPath, getServiceDaemonDir } =
+				await import('../utils/platform/index.js');
 
 			if (process.platform === 'darwin') {
 				const plistPath = getLaunchdPlistPath();
@@ -538,6 +553,9 @@ export async function runCLI(
 				}
 				try {
 					execFileSync('sudo', ['rm', '-f', plistPath], { stdio: 'inherit' });
+					execFileSync('sudo', ['rm', '-rf', getServiceDaemonDir()], {
+						stdio: 'inherit',
+					});
 				} catch {
 					/* may not exist */
 				}
@@ -556,6 +574,9 @@ export async function runCLI(
 				}
 				try {
 					execFileSync('sudo', ['rm', '-f', unitPath], { stdio: 'inherit' });
+					execFileSync('sudo', ['rm', '-rf', getServiceDaemonDir()], {
+						stdio: 'inherit',
+					});
 					execFileSync('sudo', ['systemctl', 'daemon-reload'], { stdio: 'inherit' });
 				} catch {
 					/* may not exist */

@@ -26,6 +26,14 @@ const getDaemonSocketPath = (): string =>
 
 const getDaemonPidPath = (): string => path.join(getConfigDir(), 'daemon.pid');
 
+// Where `daemon install` copies the daemon bundle. A system service must NOT execute from
+// the install location: user paths churn (nvm prunes, repos move) and macOS TCC denies even
+// root access to Desktop/Documents — the EPERM crash-loop that motivated this.
+const getServiceDaemonDir = (): string =>
+	process.platform === 'darwin'
+		? '/Library/Application Support/proxy-dev'
+		: '/usr/local/lib/proxy-dev';
+
 const getSystemdUnitPath = (): string =>
 	path.join('/etc', 'systemd', 'system', 'proxy-dev-daemon.service');
 
@@ -42,6 +50,7 @@ export {
 	getGlobalConfigPath,
 	getHostsPath,
 	getLaunchdPlistPath,
+	getServiceDaemonDir,
 	getSystemdUnitPath,
 	getLeavesDir,
 	getPidPath,

@@ -13,7 +13,10 @@ and this project adheres to a custom versioning scheme where the major version r
   `systemctl enable --now`, `Restart=always`). One sudo at install; the daemon then
   survives crashes and reboots, retiring the once-per-boot `daemon start`. The service
   bakes `PROXY_DEV_SOCKET` in (system services have no user HOME) and `daemon install`
-  hands over from a running ad-hoc daemon first. The previous implementation wrote a USER
+  hands over from a running ad-hoc daemon first. The daemon bundle is COPIED to a system
+  path (`/Library/Application Support/proxy-dev` / `/usr/local/lib/proxy-dev`) — services
+  must not execute from install locations: user paths churn and macOS TCC denies even
+  root access to Desktop/Documents (EPERM crash-loop). The previous implementation wrote a USER
   LaunchAgent, which could never edit /etc/hosts.
 - Daemon lifecycle log at `<config dir>/daemon.log` — the daemon runs detached with stdio
   ignored, so starts, signals, crashes (uncaughtException/unhandledRejection), and exits now
