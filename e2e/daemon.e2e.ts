@@ -28,10 +28,17 @@ describe('Daemon subcommand E2E', () => {
 	it('daemon --help lists all daemon subcommands', () => {
 		const out = run(['daemon', '--help']);
 		expect(out).toContain('Manage the hosts daemon');
+		expect(out).toContain('start');
 		expect(out).toContain('status');
 		expect(out).toContain('stop');
 		expect(out).toContain('install');
 		expect(out).toContain('uninstall');
+	});
+
+	it('daemon start --help shows start description', () => {
+		const out = run(['daemon', 'start', '--help']);
+		expect(out).toContain('Start the hosts daemon');
+		expect(out).toContain('sudo step');
 	});
 
 	it('daemon status --help shows status description', () => {

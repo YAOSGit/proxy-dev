@@ -22,6 +22,50 @@ type SetupResult = {
 	cleanup: () => void;
 };
 
+/**
+ * Ensure the hosts daemon is up — the ONLY step that needs sudo. Exposed as
+ * `proxy-dev daemon start` so the authorization can happen once (per boot) in a
+ * real terminal; after that, `proxy-dev start` is sudo-free and safe to run in
+ * environments that cannot prompt (run-tui panes, CI wrappers, editors).
+ */
+const ensureHostsDaemon = async (): Promise<boolean> => {
+	const { spawnDaemon, isDaemonRunning } = await import('../daemon/index.js');
+	const { getDaemonSocketPath, getDaemonPidPath } = await import(
+		'../utils/platform/index.js'
+	);
+
+	const socketPath = getDaemonSocketPath();
+
+	if (await isDaemonRunning(socketPath)) {
+		console.log('Hosts daemon already running.');
+		return true;
+	}
+
+	console.log('Starting hosts daemon...');
+	try {
+		execFileSync('sudo', ['-v'], { stdio: 'inherit' });
+	} catch {
+		console.error('\n  Authentication failed or was cancelled.');
+		console.error(
+			'  proxy-dev needs sudo to manage /etc/hosts and listen on port 443/80.',
+		);
+		return false;
+	}
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	const daemonPath = path.resolve(__dirname, 'daemon.js');
+	const started = await spawnDaemon(
+		daemonPath,
+		socketPath,
+		getDaemonPidPath(),
+	);
+	if (!started) {
+		console.error('Failed to start hosts daemon.');
+		return false;
+	}
+	console.log('  Hosts daemon started.');
+	return true;
+};
+
 const setup = async (opts?: {
 	config?: string;
 	mode?: string;
@@ -47,40 +91,15 @@ const setup = async (opts?: {
 	// Write PID
 	fs.writeFileSync(getPidPath(), String(process.pid));
 
-	// Ensure daemon is running
-	const { DaemonClient, spawnDaemon, isDaemonRunning } = await import(
-		'../daemon/index.js'
-	);
-	const { getDaemonSocketPath, getDaemonPidPath } = await import(
-		'../utils/platform/index.js'
-	);
-
-	const socketPath = getDaemonSocketPath();
-	const pidPath = getDaemonPidPath();
-
-	const alreadyRunning = await isDaemonRunning(socketPath);
-	if (!alreadyRunning) {
-		console.log('Starting hosts daemon...');
-		try {
-			execFileSync('sudo', ['-v'], { stdio: 'inherit' });
-		} catch {
-			console.error('\n  Authentication failed or was cancelled.');
-			console.error(
-				'  proxy-dev needs sudo to manage /etc/hosts and listen on port 443/80.',
-			);
-			process.exit(1);
-		}
-		const __dirname = path.dirname(fileURLToPath(import.meta.url));
-		const daemonPath = path.resolve(__dirname, 'daemon.js');
-		const started = await spawnDaemon(daemonPath, socketPath, pidPath);
-		if (!started) {
-			console.error('Failed to start hosts daemon.');
-			process.exit(1);
-		}
-		console.log('  Hosts daemon started.');
-	} else {
-		console.log('Hosts daemon already running.');
+	// Ensure daemon is running (the one sudo step; see ensureHostsDaemon)
+	const daemonUp = await ensureHostsDaemon();
+	if (!daemonUp) {
+		process.exit(1);
 	}
+
+	const { DaemonClient } = await import('../daemon/index.js');
+	const { getDaemonSocketPath } = await import('../utils/platform/index.js');
+	const socketPath = getDaemonSocketPath();
 
 	// Register cleanup handlers — only remove this instance's domains from
 	// /etc/hosts, not all proxy-dev entries (other instances may be running).
@@ -126,4 +145,4 @@ const setup = async (opts?: {
 };
 
 export type { SetupResult };
-export { setup };
+export { ensureHostsDaemon, setup };

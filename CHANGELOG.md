@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [226.1.0] - 2026-07-28
+
+### Added
+- `proxy-dev daemon start` — authorize and spawn the hosts daemon on its own (the single sudo
+  step). Once the daemon is up, `proxy-dev start` runs sudo-free, so the proxy can start from
+  environments that cannot prompt for a password (run-tui panes, editors, CI wrappers).
+
+### Changed
+- Daemon bootstrap extracted from `setup()` into a shared `ensureHostsDaemon()` used by both
+  `start` and `daemon start` (behavior unchanged for `start`).
+
 ## [126.1.0] - 2026-03-19
 
 ### Added

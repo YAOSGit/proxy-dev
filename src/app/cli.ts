@@ -388,6 +388,18 @@ export async function runCLI(
 		.description('Manage the hosts daemon');
 
 	daemonCmd
+		.command('start')
+		.description(
+			'Start the hosts daemon (the one sudo step; the proxy then starts without it)',
+		)
+		.action(async () => {
+			const { ensureHostsDaemon } = await import('./setup.js');
+			const ok = await ensureHostsDaemon();
+			process.exitCode = ok ? 0 : 1;
+			return;
+		});
+
+	daemonCmd
 		.command('status')
 		.description('Check if daemon is running')
 		.action(async () => {
