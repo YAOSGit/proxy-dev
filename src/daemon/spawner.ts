@@ -71,11 +71,12 @@ const spawnDaemon = async (
 		'sudo',
 		['--preserve-env=PROXY_DEV_SOCKET', process.execPath, daemonScriptPath],
 		{
+			// NOT detached: sudo reads the password from the controlling terminal
+			// (/dev/tty), which a detached (new-session) child does not have. The
+			// daemon still outlives us — once this command exits, its process group
+			// is no longer the foreground group, so a later Ctrl+C never reaches it.
+			// (The old danger window was the post-success hang below.)
 			stdio: ['ignore', 'ignore', 'pipe'],
-			// Own process group: the daemon must survive both the spawning CLI's exit
-			// and that terminal's Ctrl+C (SIGINT goes to the foreground group — without
-			// this, interrupting `daemon start` killed the daemon it just started).
-			detached: true,
 			env: { ...process.env, PROXY_DEV_SOCKET: socketPath },
 		},
 	);
