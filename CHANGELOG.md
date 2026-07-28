@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
-## [226.1.1] - 2026-07-28
+## [226.1.2] - 2026-07-28
 
 ### Fixed
 - `daemon start` printed success and then hung the terminal — the spawned child's stderr pipe
