@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
+import net from 'node:net';
 import path from 'node:path';
 import tls from 'node:tls';
 import { parentPort } from 'node:worker_threads';
@@ -315,6 +316,31 @@ const startServer = (certs: CertPathsForWorker): void => {
 	httpsServer = https.createServer(sslOptions, (req, res) =>
 		requestHandler(req, res, true),
 	);
+
+	// WebSocket / HTTP Upgrade support: without this, WS handshakes die silently and
+	// upgrade-dependent UIs hang forever (MinIO console's object browser, Vite HMR, …).
+	// Raw TCP tunnel to the target: replay the request head, then pipe both directions.
+	httpsServer.on('upgrade', (req, socket, head) => {
+		const host = req.headers.host?.split(':')[0] ?? '';
+		const urlPath = new URL(req.url ?? '/', `https://${host}`).pathname;
+		const route = matchRoute(host, urlPath, state.routes);
+		if (!route) {
+			socket.destroy();
+			return;
+		}
+		const upstream = net.connect(route.target, '127.0.0.1', () => {
+			const lines = [`${req.method} ${req.url} HTTP/1.1`];
+			for (let i = 0; i < req.rawHeaders.length; i += 2) {
+				lines.push(`${req.rawHeaders[i]}: ${req.rawHeaders[i + 1]}`);
+			}
+			upstream.write(`${lines.join('\r\n')}\r\n\r\n`);
+			if (head.length > 0) upstream.write(head);
+			upstream.pipe(socket);
+			socket.pipe(upstream);
+		});
+		upstream.on('error', () => socket.destroy());
+		socket.on('error', () => upstream.destroy());
+	});
 
 	// Listen on an OS-assigned port (0) so multiple instances can coexist.
 	// The daemon's SNI TCP router on port 443 forwards traffic here.

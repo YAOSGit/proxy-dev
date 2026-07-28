@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to a custom versioning scheme where the major version represents Node.js compatibility.
 
+## [226.2.1] - 2026-07-28
+
+### Fixed
+- WebSocket / HTTP Upgrade requests were silently dropped — the proxy worker had no `upgrade`
+  handler, so WS-dependent UIs hung forever (MinIO console object browser, Vite HMR, any
+  socket-based dev tool). Upgrades now tunnel raw TCP to the target: the request head is
+  replayed and both directions are piped.
+
 ## [226.2.0] - 2026-07-28
 
 ### Added
