@@ -8,6 +8,11 @@ and this project adheres to a custom versioning scheme where the major version r
 ## [226.1.1] - 2026-07-28
 
 ### Fixed
+- `daemon start` printed success and then hung the terminal — the spawned child's stderr pipe
+  kept the event loop alive (`unref()` does not cover open stdio pipes); the pipe is now
+  released once the daemon socket is up
+- The daemon died when its spawning terminal was interrupted — the child shared the
+  foreground process group, so Ctrl+C's SIGINT reached sudo/daemon; it now spawns `detached`
 - Headless `start` never wrote its domains to /etc/hosts — it registered them with the
   daemon's SNI router only, so `.test`/`.local` domains resolved solely under the TUI (whose
   useHosts hook did the hosts half). Headless now calls `addHost` alongside `register`,

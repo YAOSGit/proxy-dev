@@ -72,6 +72,10 @@ const spawnDaemon = async (
 		['--preserve-env=PROXY_DEV_SOCKET', process.execPath, daemonScriptPath],
 		{
 			stdio: ['ignore', 'ignore', 'pipe'],
+			// Own process group: the daemon must survive both the spawning CLI's exit
+			// and that terminal's Ctrl+C (SIGINT goes to the foreground group — without
+			// this, interrupting `daemon start` killed the daemon it just started).
+			detached: true,
 			env: { ...process.env, PROXY_DEV_SOCKET: socketPath },
 		},
 	);
@@ -92,9 +96,15 @@ const spawnDaemon = async (
 		}
 	});
 
+	const ok = await waitForSocket(socketPath);
+
+	// Release every handle tying the daemon to this process. The stderr pipe is the
+	// subtle one: unref() alone does not cover open stdio pipes, and that kept the
+	// event loop alive — `daemon start` printed success and then hung the terminal.
+	child.stderr?.destroy();
 	child.unref();
 
-	return waitForSocket(socketPath);
+	return ok;
 };
 
 export { cleanStaleDaemon, isDaemonRunning, spawnDaemon, waitForSocket };
